@@ -1,22 +1,17 @@
-package net.kylejones.workouttracker;
+package net.kylejones.workouttracker.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import net.kylejones.workouttracker.AuthenticationProviderService;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
-public class ProjectConfig extends WebSecurityConfigurerAdapter {
+public class WebAuthorizationConfig extends WebSecurityConfigurerAdapter {
+    private final AuthenticationProviderService authenticationProvider;
 
-    @Autowired
-    private AuthenticationProviderService authenticationProvider;
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
+    public WebAuthorizationConfig(AuthenticationProviderService authenticationProvider) {
+        this.authenticationProvider = authenticationProvider;
     }
 
     @Override
@@ -24,6 +19,10 @@ public class ProjectConfig extends WebSecurityConfigurerAdapter {
         auth.authenticationProvider(authenticationProvider);
     }
 
+    /**
+     * By making the class extend `WebSecurityConfigurerAdapter` and overriding this method, it allows us to
+     * override endpoint authorization configurations
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.formLogin()
