@@ -5,8 +5,8 @@ export function BottomNav() {
   const [location] = useLocation();
 
   const navItems = [
-    { icon: List, label: "Exercises", path: "/" },
     { icon: Dumbbell, label: "Workout", path: "/workout" },
+    { icon: List, label: "Exercises", path: "/" },
     { icon: History, label: "History", path: "/history" },
     { icon: User, label: "Profile", path: "/profile" },
   ];
