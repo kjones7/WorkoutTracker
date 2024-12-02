@@ -1,4 +1,4 @@
-import { MoreVertical, CalendarClock } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "../components/BottomNav";
@@ -26,9 +26,6 @@ export function WorkoutPage() {
       <Card className="p-4 space-y-2">
         <div className="flex justify-between items-start">
           <h3 className="font-semibold">{template.name}</h3>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <MoreVertical className="h-4 w-4" />
-          </Button>
         </div>
         <p className="text-sm text-gray-500">
           {template.exercises.map(e => exercises.find(ex => ex.id === e.exerciseId)?.name).join(", ")}
