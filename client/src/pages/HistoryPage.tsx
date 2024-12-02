@@ -19,13 +19,6 @@ export function HistoryPage() {
   const [selectedWorkout, setSelectedWorkout] = useState<string | null>(null);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      try {
-        const data = await getWorkouts();
-        setWorkouts(data);
-      } catch (error) {
-        console.error('Error fetching workouts:', error);
   const handleDeleteWorkout = async (key: string) => {
     try {
       await deleteWorkout(key);
@@ -46,6 +39,14 @@ export function HistoryPage() {
     }
     setSelectedWorkout(null);
   };
+
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const data = await getWorkouts();
+        setWorkouts(data);
+      } catch (error) {
+        console.error('Error fetching workouts:', error);
       }
     };
     fetchWorkouts();
@@ -66,7 +67,6 @@ export function HistoryPage() {
     let maxWeight = 0;
     const startTime = new Date(workout.completedAt);
     
-    // Get the last set completion time and calculate statistics
     let lastSetTime = startTime;
     workout.exercises.forEach(exercise => {
       let exerciseMaxWeight = 0;
@@ -82,14 +82,12 @@ export function HistoryPage() {
         }
       });
       
-      // Check if this exercise has a PR (comparing with the exercise's previous max)
       if (exerciseMaxWeight > maxWeight) {
         maxWeight = exerciseMaxWeight;
         prs++;
       }
     });
 
-    // Calculate duration in minutes
     const durationMs = lastSetTime.getTime() - startTime.getTime();
     const durationMins = Math.round(durationMs / (1000 * 60));
     
@@ -155,13 +153,6 @@ export function HistoryPage() {
                   <div className="flex items-center gap-1" title="Personal Records">
                     <Trophy className="h-4 w-4 text-blue-500" />
                     <span>{stats.prs} {stats.prs === 1 ? 'PR' : 'PRs'}</span>
-      <ConfirmDialog
-        isOpen={!!selectedWorkout}
-        onClose={() => setSelectedWorkout(null)}
-        onConfirm={() => selectedWorkout && handleDeleteWorkout(selectedWorkout)}
-        title="Delete Workout"
-        description="Are you sure you want to delete this workout? This action cannot be undone."
-      />
                   </div>
                 </div>
 
@@ -192,6 +183,14 @@ export function HistoryPage() {
           })}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={!!selectedWorkout}
+        onClose={() => setSelectedWorkout(null)}
+        onConfirm={() => selectedWorkout && handleDeleteWorkout(selectedWorkout)}
+        title="Delete Workout"
+        description="Are you sure you want to delete this workout? This action cannot be undone."
+      />
     </div>
   );
 }
