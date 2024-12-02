@@ -38,7 +38,7 @@ export function registerRoutes(app: Express) {
       const dbList = await db.list();
       console.log('Raw database keys:', dbList);
       
-      const workoutKeys = Object.keys(dbList).filter(key => key.startsWith('workout:'));
+      const workoutKeys = dbList.value.filter(key => key.startsWith('workout:'));
       console.log('Filtered workout keys:', workoutKeys);
       
       if (!workoutKeys.length) {
@@ -50,6 +50,7 @@ export function registerRoutes(app: Express) {
         workoutKeys.map(async (key) => {
           try {
             const workout = await db.get(key);
+            console.log('Retrieved workout:', workout);
             console.log(`Retrieved workout data for key ${key}:`, workout);
             
             // Type guard function to validate WorkoutData
