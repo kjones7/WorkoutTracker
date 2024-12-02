@@ -21,14 +21,20 @@ export function HistoryPage() {
 
   const handleDeleteWorkout = async (key: string) => {
     try {
-      // Use the original timestamp key format
-      const formattedKey = key.startsWith('workout:') ? key : `workout:${key}`;
+      // Convert ISO timestamp to milliseconds if needed
+      const timestamp = key.startsWith('workout:') 
+        ? key.replace('workout:', '')
+        : new Date(key).getTime().toString();
+      
+      const formattedKey = `workout:${timestamp}`;
       console.log("Attempting to delete workout with key:", formattedKey);
       await deleteWorkout(formattedKey);
 
       // Only update UI state if the database deletion was successful
       setWorkouts((prevWorkouts) =>
-        prevWorkouts.filter((workout) => workout.completedAt !== key),
+        prevWorkouts.filter((workout) => 
+          new Date(workout.completedAt).getTime().toString() !== timestamp
+        ),
       );
 
       toast({

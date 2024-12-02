@@ -57,9 +57,11 @@ export function registerRoutes(app: Express) {
               return null;
             }
 
+            // Keep the numeric timestamp format
+            const timestamp = key.replace("workout:", "");
             return {
               ...workout,
-              completedAt: key.replace("workout:", ""),
+              completedAt: timestamp,
             };
           } catch (err) {
             console.warn(`Error processing workout ${key}:`, err);
