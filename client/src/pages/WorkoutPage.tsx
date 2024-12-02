@@ -60,7 +60,6 @@ export function WorkoutPage() {
             </div>
           </div>
 
-          <h3 className="text-base font-medium">My Templates ({workoutTemplates.length})</h3>
           <div className="space-y-3">
             {workoutTemplates.map((template) => (
               <TemplateCard key={template.id} template={template} />
