@@ -38,3 +38,12 @@ export const getWorkouts = async (): Promise<WorkoutData[]> => {
 
   return response.json();
 };
+export const deleteWorkout = async (key: string): Promise<void> => {
+  const response = await fetch(`/api/workouts/${key}`, {
+    method: 'DELETE',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to delete workout');
+  }
+};

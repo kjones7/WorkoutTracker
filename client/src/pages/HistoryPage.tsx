@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, Clock, Weight, Trophy } from "lucide-react";
-import { getWorkouts } from "../lib/database";
+import { MoreVertical, Clock, Weight, Trophy, Trash2 } from "lucide-react";
+import { getWorkouts, deleteWorkout } from "../lib/database";
 import { exercises } from "../data/exercises";
 import type { WorkoutData } from "../lib/database";
+import { ConfirmDialog } from "../components/ConfirmDialog";
+import { useToast } from "../hooks/use-toast";
 
 export function HistoryPage() {
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
+  const [selectedWorkout, setSelectedWorkout] = useState<string | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchWorkouts = async () => {
@@ -16,6 +20,26 @@ export function HistoryPage() {
         setWorkouts(data);
       } catch (error) {
         console.error('Error fetching workouts:', error);
+  const handleDeleteWorkout = async (key: string) => {
+    try {
+      await deleteWorkout(key);
+      setWorkouts(prevWorkouts => 
+        prevWorkouts.filter(workout => !workout.completedAt.includes(key))
+      );
+      toast({
+        title: "Success",
+        description: "Workout deleted successfully",
+      });
+    } catch (error) {
+      console.error('Error deleting workout:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete workout",
+        variant: "destructive",
+      });
+    }
+    setSelectedWorkout(null);
+  };
       }
     };
     fetchWorkouts();
@@ -89,8 +113,13 @@ export function HistoryPage() {
               <Card key={index} className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="font-semibold text-lg">{workout.name}</h2>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreVertical className="h-4 w-4" />
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
+                    onClick={() => setSelectedWorkout(workout.completedAt)}
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
                 
@@ -112,6 +141,13 @@ export function HistoryPage() {
                   <div className="flex items-center gap-1" title="Personal Records">
                     <Trophy className="h-4 w-4 text-blue-500" />
                     <span>{stats.prs} {stats.prs === 1 ? 'PR' : 'PRs'}</span>
+      <ConfirmDialog
+        isOpen={!!selectedWorkout}
+        onClose={() => setSelectedWorkout(null)}
+        onConfirm={() => selectedWorkout && handleDeleteWorkout(selectedWorkout)}
+        title="Delete Workout"
+        description="Are you sure you want to delete this workout? This action cannot be undone."
+      />
                   </div>
                 </div>
 

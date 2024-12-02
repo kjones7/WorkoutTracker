@@ -117,4 +117,15 @@ export function registerRoutes(app: Express) {
       res.status(500).json({ message: "Failed to retrieve workouts" });
     }
   });
+  app.delete("/api/workouts/:key", async (req, res) => {
+    try {
+      const key = `workout:${req.params.key}`;
+      await db.delete(key);
+      res.json({ message: "Workout deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting workout:", error);
+      res.status(500).json({ message: "Failed to delete workout" });
+    }
+  });
+
 }
