@@ -122,25 +122,17 @@ export function registerRoutes(app: Express) {
       const keyParam = req.params.key;
       console.log('Received delete request for key:', keyParam);
       const key = keyParam.startsWith('workout:') ? keyParam : `workout:${keyParam}`;
-      console.log('Formatted key for deletion:', key);
+      console.log('Attempting direct deletion for key:', key);
       
-      // Get current value before deletion
-      const beforeDelete = await db.get(key);
-      console.log('Value before deletion:', beforeDelete);
-      
-      // If the item doesn't exist (404 response), consider it already deleted
-      if (beforeDelete && beforeDelete.error && beforeDelete.error.statusCode === 404) {
-        console.log('Workout already deleted or does not exist');
-        return res.json({ message: "Workout deleted successfully" });
+      // Direct deletion without pre-check
+      try {
+        await db.delete(key);
+        console.log('Database delete operation completed for key:', key);
+        res.json({ message: "Workout deleted successfully" });
+      } catch (dbError) {
+        console.error('Database error during deletion:', dbError);
+        throw new Error('Database deletion failed');
       }
-      
-      // Perform deletion
-      await db.delete(key);
-      console.log('Delete operation completed');
-      
-      // Success - no need to verify since a 404 is actually what we want
-      console.log('Successfully deleted key from database:', key);
-      res.json({ message: "Workout deleted successfully" });
     } catch (error) {
       console.error("Error deleting workout:", error);
       res.status(500).json({ message: "Failed to delete workout" });
