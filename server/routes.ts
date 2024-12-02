@@ -122,17 +122,24 @@ export function registerRoutes(app: Express) {
       const keyParam = req.params.key;
       console.log('Received delete request for key:', keyParam);
       const key = keyParam.startsWith('workout:') ? keyParam : `workout:${keyParam}`;
-      console.log('Attempting direct deletion for key:', key);
+      console.log('Attempting deletion for key:', key);
       
-      // Direct deletion without pre-check
-      try {
-        await db.delete(key);
-        console.log('Database delete operation completed for key:', key);
-        res.json({ message: "Workout deleted successfully" });
-      } catch (dbError) {
-        console.error('Database error during deletion:', dbError);
-        throw new Error('Database deletion failed');
+      // Perform deletion
+      await db.delete(key);
+      
+      // Force clear potential cached data
+      await db.list('workout:', { prefix: true });
+      
+      // Verify deletion
+      const verifyGet = await db.get(key);
+      console.log('Verification after deletion:', verifyGet);
+      
+      if (verifyGet !== null) {
+        throw new Error('Workout still exists after deletion');
       }
+      
+      console.log('Successfully deleted and verified key:', key);
+      res.json({ message: "Workout deleted successfully" });
     } catch (error) {
       console.error("Error deleting workout:", error);
       res.status(500).json({ message: "Failed to delete workout" });
