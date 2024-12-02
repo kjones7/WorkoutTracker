@@ -142,7 +142,11 @@ export function HistoryPage() {
               <Card key={index} className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="font-semibold text-lg">{workout.name}</h2>
-                  <DropdownMenu>
+                  <DropdownMenu onOpenChange={() => {
+                    if (selectedWorkout) {
+                      setSelectedWorkout(null);
+                    }
+                  }}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreVertical className="h-4 w-4" />
@@ -151,7 +155,11 @@ export function HistoryPage() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         className="text-red-600 focus:text-red-600"
-                        onClick={() => setSelectedWorkout(workout.id)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSelectedWorkout(workout.id);
+                        }}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete Workout
