@@ -28,9 +28,9 @@ export function ActiveWorkout() {
     workout?.exercises.map(e => ({
       exerciseId: e.exerciseId,
       sets: Array(e.sets).fill({
-        weight: e.weight,
-        reps: e.reps,
-        time: e.duration,
+        weight: undefined,
+        reps: undefined,
+        time: undefined,
         completed: false
       })
     })) ?? []
