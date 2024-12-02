@@ -27,12 +27,7 @@ export function ActiveWorkout() {
   const [activeExercises, setActiveExercises] = useState<ActiveExercise[]>(() => 
     workout?.exercises.map(e => ({
       exerciseId: e.exerciseId,
-      sets: Array(e.sets).fill({
-        weight: e.weight,
-        reps: e.reps,
-        time: e.duration,
-        completed: false
-      })
+      sets: [] // Start with empty array, will be populated when adding sets
     })) ?? []
   );
 
@@ -141,28 +136,22 @@ export function ActiveWorkout() {
                 </button>
               </div>
               <div className="rounded-lg bg-gray-50 overflow-hidden">
-                <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 px-4 py-2 bg-gray-100">
+                <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-2 px-4 py-2 bg-gray-100">
                   <div className="text-sm font-medium text-gray-500">Set</div>
-                  <div className="text-sm font-medium text-gray-500">Previous</div>
-                  {activeExercise.sets[0]?.weight !== undefined ? (
+                  {exercises.find(e => e.id === activeExercise.exerciseId)?.category === 'Duration' ? (
+                    <div className="text-sm font-medium text-gray-500 col-span-2">Time</div>
+                  ) : (
                     <>
                       <div className="text-sm font-medium text-gray-500">lbs</div>
                       <div className="text-sm font-medium text-gray-500">Reps</div>
                     </>
-                  ) : (
-                    <div className="text-sm font-medium text-gray-500 col-span-2">Time</div>
                   )}
                   <div></div>
                 </div>
                 {activeExercise.sets.map((set, setIndex) => (
                   <div key={setIndex} 
-                    className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 px-4 py-2 items-center border-t border-gray-200">
+                    className="grid grid-cols-[auto_1fr_1fr_auto] gap-2 px-4 py-2 items-center border-t border-gray-200">
                     <div className="text-sm font-medium w-8">{setIndex + 1}</div>
-                    <div className="text-sm text-gray-600">
-                      {set.weight !== undefined 
-                        ? `${set.weight} lb × ${set.reps}`
-                        : set.time}
-                    </div>
                     {set.weight !== undefined ? (
                       <>
                         <input
