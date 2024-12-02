@@ -35,18 +35,22 @@ export function registerRoutes(app: Express) {
   app.get("/api/workouts", async (_req, res) => {
     try {
       // Get all keys with prefix 'workout:'
-      const dbList = await db.list('workout:');
-      console.log('Raw database keys:', dbList);
+      const dbResponse = await db.list('workout:');
+      console.log('Raw database response:', dbResponse);
 
-      if (!dbList || !Array.isArray(dbList)) {
+      if (!dbResponse?.ok || !Array.isArray(dbResponse.value)) {
         console.log('No valid database list found');
         return res.json([]);
       }
-    
+
+      const dbList = dbResponse.value;
+      console.log('Processing database keys:', dbList);
+      
       const workouts = await Promise.all(
         dbList.map(async (key) => {
           try {
             const workout = await db.get(key);
+            console.log(`Fetched workout for key ${key}:`, workout);
             
             // If we get a 404 or null, this workout was deleted
             if (!workout || workout?.error?.statusCode === 404) {
