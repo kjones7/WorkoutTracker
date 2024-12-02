@@ -21,21 +21,22 @@ export function HistoryPage() {
 
   const handleDeleteWorkout = async (key: string) => {
     try {
-      console.log('Attempting to delete workout with key:', key);
-      // First attempt to delete from the database
-      await deleteWorkout(key);
-      
+      // Ensure the key matches the format used in the database
+      const formattedKey = `workout:${new Date(key).getTime()}`;
+      console.log("Attempting to delete workout with key:", formattedKey);
+      await deleteWorkout(formattedKey);
+
       // Only update UI state if the database deletion was successful
-      setWorkouts(prevWorkouts => 
-        prevWorkouts.filter(workout => workout.completedAt !== key)
+      setWorkouts((prevWorkouts) =>
+        prevWorkouts.filter((workout) => workout.completedAt !== key),
       );
-      
+
       toast({
         title: "Success",
         description: "Workout deleted successfully",
       });
     } catch (error) {
-      console.error('Error deleting workout:', error);
+      console.error("Error deleting workout:", error);
       toast({
         title: "Error",
         description: "Failed to delete workout. Please try again.",
@@ -52,7 +53,7 @@ export function HistoryPage() {
         const data = await getWorkouts();
         setWorkouts(data);
       } catch (error) {
-        console.error('Error fetching workouts:', error);
+        console.error("Error fetching workouts:", error);
       }
     };
     fetchWorkouts();
@@ -60,8 +61,8 @@ export function HistoryPage() {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const day = date.toLocaleDateString('en-US', { weekday: 'long' });
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const day = date.toLocaleDateString("en-US", { weekday: "long" });
+    const month = date.toLocaleDateString("en-US", { month: "short" });
     const dayNum = date.getDate();
     return { day, date: `${month} ${dayNum}` };
   };
@@ -72,8 +73,8 @@ export function HistoryPage() {
       totalWeight: 0,
       totalReps: 0,
       prs: 0,
-      duration: '0m',
-      maxWeight: 0
+      duration: "0m",
+      maxWeight: 0,
     };
 
     // Return default stats if workout is invalid
@@ -86,15 +87,15 @@ export function HistoryPage() {
     let prs = 0;
     let maxWeight = 0;
     const startTime = new Date(workout.completedAt);
-    
+
     let lastSetTime = startTime;
-    workout.exercises.forEach(exercise => {
+    workout.exercises.forEach((exercise) => {
       if (!exercise || !exercise.sets) return;
-      
+
       let exerciseMaxWeight = 0;
-      exercise.sets.forEach(set => {
+      exercise.sets.forEach((set) => {
         if (!set) return;
-        
+
         if (set.completed) {
           if (set.weight && set.reps) {
             const setVolume = set.weight * set.reps;
@@ -105,7 +106,7 @@ export function HistoryPage() {
           lastSetTime = new Date(workout.completedAt);
         }
       });
-      
+
       if (exerciseMaxWeight > maxWeight) {
         maxWeight = exerciseMaxWeight;
         prs++;
@@ -114,13 +115,13 @@ export function HistoryPage() {
 
     const durationMs = lastSetTime.getTime() - startTime.getTime();
     const durationMins = Math.round(durationMs / (1000 * 60));
-    
+
     return {
       totalWeight,
       totalReps,
       prs,
       duration: `${durationMins}m`,
-      maxWeight
+      maxWeight,
     };
   };
 
@@ -137,7 +138,7 @@ export function HistoryPage() {
             if (!workout || !workout.exercises) return null;
             const { day, date } = formatDate(workout.completedAt);
             const stats = calculateWorkoutStats(workout);
-            
+
             return (
               <Card key={index} className="p-4">
                 <div className="flex justify-between items-start mb-2">
@@ -149,7 +150,7 @@ export function HistoryPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         className="text-red-600 focus:text-red-600"
                         onClick={() => setSelectedWorkout(workout.completedAt)}
                       >
@@ -159,8 +160,10 @@ export function HistoryPage() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
-                
-                <p className="text-gray-600 mb-3">{day}, {date}</p>
+
+                <p className="text-gray-600 mb-3">
+                  {day}, {date}
+                </p>
 
                 <div className="flex flex-wrap gap-4 mb-3 text-sm">
                   <div className="flex items-center gap-1" title="Duration">
@@ -175,29 +178,44 @@ export function HistoryPage() {
                     <span className="text-gray-500">×</span>
                     <span>{stats.totalReps} reps</span>
                   </div>
-                  <div className="flex items-center gap-1" title="Personal Records">
+                  <div
+                    className="flex items-center gap-1"
+                    title="Personal Records"
+                  >
                     <Trophy className="h-4 w-4 text-blue-500" />
-                    <span>{stats.prs} {stats.prs === 1 ? 'PR' : 'PRs'}</span>
+                    <span>
+                      {stats.prs} {stats.prs === 1 ? "PR" : "PRs"}
+                    </span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   {workout.exercises.map((exercise, i) => {
-                    const exerciseData = exercises.find(e => e.id === exercise.exerciseId);
+                    const exerciseData = exercises.find(
+                      (e) => e.id === exercise.exerciseId,
+                    );
                     const bestSet = exercise.sets.reduce((best, current) => {
                       if (!current.completed) return best;
                       if (!best.weight || !best.reps) return current;
                       if (!current.weight || !current.reps) return best;
-                      return (current.weight * current.reps > best.weight * best.reps) ? current : best;
+                      return current.weight * current.reps >
+                        best.weight * best.reps
+                        ? current
+                        : best;
                     }, exercise.sets[0]);
 
                     return (
-                      <div key={i} className="flex justify-between items-center">
+                      <div
+                        key={i}
+                        className="flex justify-between items-center"
+                      >
                         <span className="text-sm text-gray-900">
-                          {`${exercise.sets.filter(s => s.completed).length}× ${exerciseData?.name}`}
+                          {`${exercise.sets.filter((s) => s.completed).length}× ${exerciseData?.name}`}
                         </span>
                         <span className="text-sm text-gray-600">
-                          {bestSet.weight ? `${bestSet.weight} lb × ${bestSet.reps}` : bestSet.time}
+                          {bestSet.weight
+                            ? `${bestSet.weight} lb × ${bestSet.reps}`
+                            : bestSet.time}
                         </span>
                       </div>
                     );
@@ -212,7 +230,9 @@ export function HistoryPage() {
       <ConfirmDialog
         isOpen={!!selectedWorkout}
         onClose={() => setSelectedWorkout(null)}
-        onConfirm={() => selectedWorkout && handleDeleteWorkout(selectedWorkout)}
+        onConfirm={() =>
+          selectedWorkout && handleDeleteWorkout(selectedWorkout)
+        }
         title="Delete Workout"
         description="Are you sure you want to delete this workout? This action cannot be undone."
       />
