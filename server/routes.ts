@@ -127,19 +127,18 @@ export function registerRoutes(app: Express) {
       // Perform deletion
       await db.delete(key);
       
-      // Force clear potential cached data
-      await db.list('workout:', { prefix: true });
-      
-      // Verify deletion
+      // Verify deletion - a 404 response means successful deletion
       const verifyGet = await db.get(key);
       console.log('Verification after deletion:', verifyGet);
       
-      if (verifyGet !== null) {
-        throw new Error('Workout still exists after deletion');
+      if (verifyGet?.error?.statusCode === 404) {
+        console.log('Successfully deleted key:', key);
+        return res.json({ message: "Workout deleted successfully" });
       }
       
-      console.log('Successfully deleted and verified key:', key);
-      res.json({ message: "Workout deleted successfully" });
+      // If we get here and don't have a 404, the workout might still exist
+      throw new Error('Workout was not deleted successfully');
+      
     } catch (error) {
       console.error("Error deleting workout:", error);
       res.status(500).json({ message: "Failed to delete workout" });
