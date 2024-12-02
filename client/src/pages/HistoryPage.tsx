@@ -67,6 +67,20 @@ export function HistoryPage() {
   };
 
   const calculateWorkoutStats = (workout: WorkoutData) => {
+    // Default values
+    const stats = {
+      totalWeight: 0,
+      totalReps: 0,
+      prs: 0,
+      duration: '0m',
+      maxWeight: 0
+    };
+
+    // Return default stats if workout is invalid
+    if (!workout || !workout.exercises) {
+      return stats;
+    }
+
     let totalWeight = 0;
     let totalReps = 0;
     let prs = 0;
@@ -75,8 +89,12 @@ export function HistoryPage() {
     
     let lastSetTime = startTime;
     workout.exercises.forEach(exercise => {
+      if (!exercise || !exercise.sets) return;
+      
       let exerciseMaxWeight = 0;
       exercise.sets.forEach(set => {
+        if (!set) return;
+        
         if (set.completed) {
           if (set.weight && set.reps) {
             const setVolume = set.weight * set.reps;
