@@ -27,9 +27,7 @@ export function HistoryPage() {
 
       // Only update UI state if the database deletion was successful
       setWorkouts((prevWorkouts) =>
-        prevWorkouts.filter((workout) => 
-          new Date(workout.completedAt).getTime().toString() !== timestamp
-        ),
+        prevWorkouts.filter((workout) => workout.id !== workoutId)
       );
 
       toast({
