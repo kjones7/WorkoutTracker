@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ExerciseLibrary } from "./pages/ExerciseLibrary";
 import { WorkoutPage } from "./pages/WorkoutPage";
 import { ActiveWorkout } from "./pages/ActiveWorkout";
+import { WorkoutComplete } from "./pages/WorkoutComplete";
 import { BottomNav } from "./components/BottomNav";
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
         <Route path="/" component={WorkoutPage} />
         <Route path="/exercises" component={ExerciseLibrary} />
         <Route path="/active-workout" component={ActiveWorkout} />
+        <Route path="/workout-complete" component={WorkoutComplete} />
         <Route>404 Page Not Found</Route>
       </Switch>
       <BottomNav />

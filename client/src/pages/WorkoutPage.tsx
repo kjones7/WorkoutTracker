@@ -83,7 +83,7 @@ export function WorkoutPage() {
         </section>
       </div>
 
-      <BottomNav />
+      
     </div>
   );
 }

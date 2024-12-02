@@ -52,7 +52,7 @@ export function ActiveWorkout() {
   const handleFinish = () => {
     // TODO: Save workout history
     sessionStorage.removeItem("activeWorkout");
-    setLocation("/workout");
+    setLocation("/workout-complete");
   };
 
   if (!workout) {
