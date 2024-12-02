@@ -102,7 +102,7 @@ export function ActiveWorkout() {
                 <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 px-4 py-2 bg-gray-100">
                   <div className="text-sm font-medium text-gray-500">Set</div>
                   <div className="text-sm font-medium text-gray-500">Previous</div>
-                  {set.weight !== undefined ? (
+                  {activeExercise.sets[0]?.weight !== undefined ? (
                     <>
                       <div className="text-sm font-medium text-gray-500">lbs</div>
                       <div className="text-sm font-medium text-gray-500">Reps</div>
