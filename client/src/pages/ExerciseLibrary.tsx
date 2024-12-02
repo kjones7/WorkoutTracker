@@ -39,7 +39,7 @@ export function ExerciseLibrary() {
         ))}
       </div>
 
-      <BottomNav />
+      
     </div>
   );
 }
