@@ -21,8 +21,8 @@ export function HistoryPage() {
 
   const handleDeleteWorkout = async (key: string) => {
     try {
-      // Ensure the key matches the format used in the database
-      const formattedKey = `workout:${new Date(key).getTime()}`;
+      // Use the original timestamp key format
+      const formattedKey = key.startsWith('workout:') ? key : `workout:${key}`;
       console.log("Attempting to delete workout with key:", formattedKey);
       await deleteWorkout(formattedKey);
 

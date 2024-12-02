@@ -89,33 +89,23 @@ export function registerRoutes(app: Express) {
       const keyParam = req.params.key;
       console.log("Received delete request for key:", keyParam);
 
-      // Check that key exists in the database
-      const dbResponse = await db.get(keyParam);
-      console.log("Database response for key:", dbResponse);
-
-      // List all workouts
-      const dbList = await db.list("workout:");
-      console.log("Database list:", dbList);
-
+      // Ensure consistent key format
       const key = keyParam.startsWith("workout:")
         ? keyParam
         : `workout:${keyParam}`;
       console.log("Attempting deletion for key:", key);
 
-      // Perform deletion
-      await db.delete(key);
-
-      // Verify deletion - a 404 response means successful deletion
-      const verifyGet = await db.get(key);
-      console.log("Verification after deletion:", verifyGet);
-
-      if (verifyGet?.error?.statusCode === 404) {
-        console.log("Successfully deleted key:", key);
-        return res.json({ message: "Workout deleted successfully" });
+      // Get current workout data to verify it exists
+      const workoutData = await db.get(key);
+      if (!workoutData || workoutData?.error?.statusCode === 404) {
+        console.log("Workout not found:", key);
+        return res.status(404).json({ message: "Workout not found" });
       }
 
-      // If we get here and don't have a 404, the workout might still exist
-      throw new Error("Workout was not deleted successfully");
+      // Perform deletion
+      await db.delete(key);
+      console.log("Successfully deleted workout:", key);
+      res.json({ message: "Workout deleted successfully" });
     } catch (error) {
       console.error("Error deleting workout:", error);
       res.status(500).json({ message: "Failed to delete workout" });
