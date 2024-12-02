@@ -7,6 +7,12 @@ import { exercises } from "../data/exercises";
 import type { WorkoutData } from "../lib/database";
 import { ConfirmDialog } from "../components/ConfirmDialog";
 import { useToast } from "../hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function HistoryPage() {
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
@@ -113,14 +119,22 @@ export function HistoryPage() {
               <Card key={index} className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="font-semibold text-lg">{workout.name}</h2>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50"
-                    onClick={() => setSelectedWorkout(workout.completedAt)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <MoreVertical className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem 
+                        className="text-red-600 focus:text-red-600"
+                        onClick={() => setSelectedWorkout(workout.completedAt)}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete Workout
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
                 
                 <p className="text-gray-600 mb-3">{day}, {date}</p>
