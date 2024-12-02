@@ -1,4 +1,4 @@
-import { Plus, MoreVertical, CalendarClock } from "lucide-react";
+import { MoreVertical, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "../components/BottomNav";
@@ -57,9 +57,6 @@ export function WorkoutPage() {
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">Templates</h2>
             <div className="flex gap-2">
-              <Button variant="outline" size="icon">
-                <Plus className="h-4 w-4" />
-              </Button>
             </div>
           </div>
 
