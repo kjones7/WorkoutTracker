@@ -120,8 +120,11 @@ export function registerRoutes(app: Express) {
   app.delete("/api/workouts/:key", async (req, res) => {
     try {
       const keyParam = req.params.key;
+      console.log('Received delete request for key:', keyParam);
       const key = keyParam.startsWith('workout:') ? keyParam : `workout:${keyParam}`;
+      console.log('Formatted key for deletion:', key);
       await db.delete(key);
+      console.log('Successfully deleted key from database:', key);
       res.json({ message: "Workout deleted successfully" });
     } catch (error) {
       console.error("Error deleting workout:", error);

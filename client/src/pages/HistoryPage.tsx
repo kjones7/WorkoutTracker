@@ -21,6 +21,7 @@ export function HistoryPage() {
 
   const handleDeleteWorkout = async (key: string) => {
     try {
+      console.log('Attempting to delete workout with key:', key);
       // First attempt to delete from the database
       await deleteWorkout(key);
       
