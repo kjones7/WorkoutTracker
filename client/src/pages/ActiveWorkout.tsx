@@ -50,6 +50,11 @@ export function ActiveWorkout() {
   };
 
   const handleFinish = async () => {
+    if (!workout || !activeExercises.length) {
+      console.error('No workout data available');
+      return;
+    }
+
     try {
       const workoutData = {
         name: workout.name,
@@ -57,10 +62,28 @@ export function ActiveWorkout() {
         completedAt: new Date().toISOString(),
       };
 
+      // Validate workout data before saving
+      const isValid = activeExercises.every(exercise => 
+        exercise.exerciseId && Array.isArray(exercise.sets) && 
+        exercise.sets.every(set => 
+          typeof set.completed === 'boolean' &&
+          (set.weight === undefined || typeof set.weight === 'number') &&
+          (set.reps === undefined || typeof set.reps === 'number') &&
+          (set.time === undefined || typeof set.time === 'string')
+        )
+      );
+
+      if (!isValid) {
+        throw new Error('Invalid workout data structure');
+      }
+
       // Save to Replit Database
-      await import('../lib/database').then(async ({ saveWorkout }) => {
-        await saveWorkout(workoutData);
-      });
+      const { saveWorkout } = await import('../lib/database');
+      const key = await saveWorkout(workoutData);
+
+      if (!key) {
+        throw new Error('Failed to get workout key from database');
+      }
 
       // Store for completion page
       sessionStorage.setItem("completedWorkout", JSON.stringify(workoutData));
@@ -69,7 +92,8 @@ export function ActiveWorkout() {
       setLocation("/workout-complete");
     } catch (error) {
       console.error('Error saving workout:', error);
-      // You might want to show an error message to the user here
+      // TODO: Add a proper error notification system
+      alert('Failed to save workout. Please try again.');
     }
   };
 
