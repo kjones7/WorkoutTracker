@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { BottomNav } from "../components/BottomNav";
 import { workoutTemplates } from "../data/templates";
 import { exercises } from "../data/exercises";
+import { useLocation } from "wouter";
 
 export function WorkoutPage() {
   const handleStartEmptyWorkout = () => {
@@ -16,23 +17,37 @@ export function WorkoutPage() {
     return `${days} days ago`;
   };
 
-  const TemplateCard = ({ template }: { template: typeof workoutTemplates[0] }) => (
-    <Card className="p-4 space-y-2">
-      <div className="flex justify-between items-start">
-        <h3 className="font-semibold">{template.name}</h3>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
-          <MoreVertical className="h-4 w-4" />
-        </Button>
-      </div>
-      <p className="text-sm text-gray-500">
-        {template.exercises.map(e => exercises.find(ex => ex.id === e.exerciseId)?.name).join(", ")}
-      </p>
-      <div className="flex items-center text-sm text-gray-500">
-        <CalendarClock className="h-4 w-4 mr-1" />
-        {formatTimeAgo(template.lastModified)}
-      </div>
-    </Card>
-  );
+  const TemplateCard = ({ template }: { template: typeof workoutTemplates[0] }) => {
+    const [, setLocation] = useLocation();
+    
+    const handleStartTemplate = () => {
+      sessionStorage.setItem("activeWorkout", JSON.stringify(template));
+      setLocation("/active-workout");
+    };
+    
+    return (
+      <Card className="p-4 space-y-2">
+        <div className="flex justify-between items-start">
+          <h3 className="font-semibold">{template.name}</h3>
+          <Button variant="ghost" size="icon" className="h-8 w-8">
+            <MoreVertical className="h-4 w-4" />
+          </Button>
+        </div>
+        <p className="text-sm text-gray-500">
+          {template.exercises.map(e => exercises.find(ex => ex.id === e.exerciseId)?.name).join(", ")}
+        </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center text-sm text-gray-500">
+            <CalendarClock className="h-4 w-4 mr-1" />
+            {formatTimeAgo(template.lastModified)}
+          </div>
+          <Button variant="default" onClick={handleStartTemplate}>
+            Start
+          </Button>
+        </div>
+      </Card>
+    );
+  };
 
   return (
     <div className="min-h-screen pb-16">
