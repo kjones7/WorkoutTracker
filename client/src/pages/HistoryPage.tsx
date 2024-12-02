@@ -21,10 +21,14 @@ export function HistoryPage() {
 
   const handleDeleteWorkout = async (key: string) => {
     try {
+      // First attempt to delete from the database
       await deleteWorkout(key);
+      
+      // Only update UI state if the database deletion was successful
       setWorkouts(prevWorkouts => 
-        prevWorkouts.filter(workout => !workout.completedAt.includes(key))
+        prevWorkouts.filter(workout => workout.completedAt !== key)
       );
+      
       toast({
         title: "Success",
         description: "Workout deleted successfully",
@@ -33,11 +37,12 @@ export function HistoryPage() {
       console.error('Error deleting workout:', error);
       toast({
         title: "Error",
-        description: "Failed to delete workout",
+        description: "Failed to delete workout. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setSelectedWorkout(null);
     }
-    setSelectedWorkout(null);
   };
 
   useEffect(() => {
