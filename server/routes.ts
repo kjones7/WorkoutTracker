@@ -123,7 +123,18 @@ export function registerRoutes(app: Express) {
       console.log('Received delete request for key:', keyParam);
       const key = keyParam.startsWith('workout:') ? keyParam : `workout:${keyParam}`;
       console.log('Formatted key for deletion:', key);
+      
+      // Perform deletion
       await db.delete(key);
+      
+      // Verify deletion
+      const verifyDeletion = await db.get(key);
+      console.log('Verification after deletion - key exists?:', !!verifyDeletion);
+      
+      if (verifyDeletion) {
+        throw new Error('Workout was not deleted successfully');
+      }
+      
       console.log('Successfully deleted key from database:', key);
       res.json({ message: "Workout deleted successfully" });
     } catch (error) {
