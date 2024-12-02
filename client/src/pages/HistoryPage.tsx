@@ -206,14 +206,40 @@ export function HistoryPage() {
                     const exerciseData = exercises.find(
                       (e) => e.id === exercise.exerciseId,
                     );
+                    // Handle empty sets array case
+                    if (!exercise.sets || exercise.sets.length === 0) {
+                      return (
+                        <div
+                          key={i}
+                          className="flex justify-between items-center"
+                        >
+                          <span className="text-sm text-gray-900">
+                            {`0× ${exerciseData?.name}`}
+                          </span>
+                          <span className="text-sm text-gray-600">
+                            No sets recorded
+                          </span>
+                        </div>
+                      );
+                    }
+
                     const bestSet = exercise.sets.reduce((best, current) => {
-                      if (!current.completed) return best;
-                      if (!best.weight || !best.reps) return current;
-                      if (!current.weight || !current.reps) return best;
-                      return current.weight * current.reps >
-                        best.weight * best.reps
-                        ? current
-                        : best;
+                      if (!current || !current.completed) return best;
+                      if (!best || !best.completed) return current;
+                      
+                      // For weighted exercises
+                      if (best.weight !== undefined && current.weight !== undefined) {
+                        const bestVolume = (best.weight || 0) * (best.reps || 0);
+                        const currentVolume = (current.weight || 0) * (current.reps || 0);
+                        return currentVolume > bestVolume ? current : best;
+                      }
+                      
+                      // For duration-based exercises
+                      if (best.time && current.time) {
+                        return current;  // Latest completed set for time-based exercises
+                      }
+                      
+                      return best;
                     }, exercise.sets[0]);
 
                     return (
@@ -222,12 +248,14 @@ export function HistoryPage() {
                         className="flex justify-between items-center"
                       >
                         <span className="text-sm text-gray-900">
-                          {`${exercise.sets.filter((s) => s.completed).length}× ${exerciseData?.name}`}
+                          {`${exercise.sets.filter((s) => s?.completed).length}× ${exerciseData?.name}`}
                         </span>
                         <span className="text-sm text-gray-600">
-                          {bestSet.weight
-                            ? `${bestSet.weight} lb × ${bestSet.reps}`
-                            : bestSet.time}
+                          {bestSet && bestSet.completed ? (
+                            bestSet.weight !== undefined
+                              ? `${bestSet.weight} lb × ${bestSet.reps}`
+                              : bestSet.time || 'No time recorded'
+                          ) : 'No sets completed'}
                         </span>
                       </div>
                     );
