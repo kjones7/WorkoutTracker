@@ -37,6 +37,11 @@ export function registerRoutes(app: Express) {
       // Get all keys with prefix 'workout:'
       const dbList = await db.list();
       console.log('Raw database keys:', dbList);
+
+      if (!dbList || !dbList.value) {
+        console.log('No database list or value found');
+        return res.json([]);
+      }
       
       const workoutKeys = dbList.value.filter(key => key.startsWith('workout:'));
       console.log('Filtered workout keys:', workoutKeys);
@@ -51,16 +56,24 @@ export function registerRoutes(app: Express) {
           try {
             const workout = await db.get(key);
             console.log('Retrieved workout:', workout);
-            console.log(`Retrieved workout data for key ${key}:`, workout);
+            
+            // Extract the actual workout data from the nested structure
+            const workoutData = workout.value || workout;
+            console.log(`Retrieved workout data for key ${key}:`, workoutData);
             
             // Type guard function to validate WorkoutData
             const isWorkoutData = (data: any): data is WorkoutData => {
-              const isValid = data &&
-                typeof data === 'object' &&
-                typeof data.name === 'string' &&
-                Array.isArray(data.exercises) &&
-                typeof data.completedAt === 'string' &&
-                data.exercises.every((exercise: any) =>
+              if (!data) return false;
+              
+              // If we have a nested structure, use the value property
+              const workoutData = data.value || data;
+              
+              return (
+                typeof workoutData === 'object' &&
+                typeof workoutData.name === 'string' &&
+                Array.isArray(workoutData.exercises) &&
+                typeof workoutData.completedAt === 'string' &&
+                workoutData.exercises.every((exercise: any) =>
                   typeof exercise === 'object' &&
                   typeof exercise.exerciseId === 'string' &&
                   Array.isArray(exercise.sets) &&
@@ -71,20 +84,16 @@ export function registerRoutes(app: Express) {
                     (set.reps === undefined || typeof set.reps === 'number') &&
                     (set.time === undefined || typeof set.time === 'string')
                   )
-                );
-              
-              if (!isValid) {
-                console.log(`Data validation failed for key ${key}:`, data);
-              }
-              return isValid;
+                )
+              );
             };
 
-            if (!isWorkoutData(workout)) {
+            if (!isWorkoutData(workoutData)) {
               console.warn(`Invalid or malformed workout data for key: ${key}`);
               return null;
             }
             
-            return workout;
+            return workoutData;
           } catch (err) {
             console.warn(`Error processing workout ${key}:`, err);
             return null;
