@@ -12,8 +12,8 @@ import { ActiveWorkout } from "./pages/ActiveWorkout";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={ExerciseLibrary} />
-      <Route path="/workout" component={WorkoutPage} />
+      <Route path="/" component={WorkoutPage} />
+      <Route path="/exercises" component={ExerciseLibrary} />
       <Route path="/active-workout" component={ActiveWorkout} />
       <Route>404 Page Not Found</Route>
     </Switch>
