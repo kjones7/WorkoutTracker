@@ -17,8 +17,8 @@ export function WorkoutComplete() {
   }, []);
 
   return (
-    <div className="min-h-screen p-4 flex flex-col items-center justify-center">
-      <Card className="w-full max-w-md p-6 space-y-6">
+    <div className="min-h-screen p-4 pb-20 flex flex-col items-center justify-center">
+      <Card className="w-full max-w-md p-6 space-y-6 mb-4">
         <div className="text-center space-y-4">
           <CheckCircle className="mx-auto h-16 w-16 text-green-500" />
           <h1 className="text-2xl font-bold text-gray-900">Workout Complete!</h1>
