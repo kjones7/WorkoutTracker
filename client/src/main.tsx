@@ -7,12 +7,14 @@ import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { ExerciseLibrary } from "./pages/ExerciseLibrary";
 import { WorkoutPage } from "./pages/WorkoutPage";
+import { ActiveWorkout } from "./pages/ActiveWorkout";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={ExerciseLibrary} />
       <Route path="/workout" component={WorkoutPage} />
+      <Route path="/active-workout" component={ActiveWorkout} />
       <Route>404 Page Not Found</Route>
     </Switch>
   );
