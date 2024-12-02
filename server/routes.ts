@@ -35,10 +35,14 @@ export function registerRoutes(app: Express) {
   app.get("/api/workouts", async (_req, res) => {
     try {
       // Get all keys with prefix 'workout:'
-      const keys = await db.list();
-      const workoutKeys = Object.keys(keys).filter(key => key.startsWith('workout:'));
+      const dbList = await db.list();
+      console.log('Raw database keys:', dbList);
+      
+      const workoutKeys = Object.keys(dbList).filter(key => key.startsWith('workout:'));
+      console.log('Filtered workout keys:', workoutKeys);
       
       if (!workoutKeys.length) {
+        console.log('No workout keys found');
         return res.json([]); // Return empty array if no workouts found
       }
 
@@ -46,11 +50,11 @@ export function registerRoutes(app: Express) {
         workoutKeys.map(async (key) => {
           try {
             const workout = await db.get(key);
+            console.log(`Retrieved workout data for key ${key}:`, workout);
             
             // Type guard function to validate WorkoutData
             const isWorkoutData = (data: any): data is WorkoutData => {
-              return (
-                data &&
+              const isValid = data &&
                 typeof data === 'object' &&
                 typeof data.name === 'string' &&
                 Array.isArray(data.exercises) &&
@@ -66,8 +70,12 @@ export function registerRoutes(app: Express) {
                     (set.reps === undefined || typeof set.reps === 'number') &&
                     (set.time === undefined || typeof set.time === 'string')
                   )
-                )
-              );
+                );
+              
+              if (!isValid) {
+                console.log(`Data validation failed for key ${key}:`, data);
+              }
+              return isValid;
             };
 
             if (!isWorkoutData(workout)) {
@@ -83,13 +91,16 @@ export function registerRoutes(app: Express) {
         })
       );
 
-      // Filter out null values and sort by completion date
+      // Explicitly type the filtered workouts array
       const validWorkouts = workouts
-        .filter((w): w is WorkoutData => w !== null)
-        .sort((a, b) => 
-          new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
-        );
+        .filter((workout): workout is NonNullable<typeof workout> => workout !== null)
+        .sort((a, b) => {
+          // Add null checks for TypeScript
+          if (!a || !b) return 0;
+          return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
+        });
 
+      console.log('Final processed workouts:', validWorkouts);
       res.json(validWorkouts);
     } catch (error) {
       console.error("Error retrieving workouts:", error);
