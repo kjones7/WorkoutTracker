@@ -42,7 +42,17 @@ export function registerRoutes(app: Express) {
       const workouts = await Promise.all(
         keys.map(async (key) => {
           const workout = await db.get(key);
-          return workout as WorkoutData;
+          if (!workout || typeof workout !== 'object') {
+            throw new Error(`Invalid workout data for key: ${key}`);
+          }
+          
+          // Validate the workout data structure
+          const workoutData = workout as any;
+          if (!workoutData.name || !Array.isArray(workoutData.exercises) || !workoutData.completedAt) {
+            throw new Error(`Invalid workout data structure for key: ${key}`);
+          }
+          
+          return workoutData as WorkoutData;
         })
       );
 
