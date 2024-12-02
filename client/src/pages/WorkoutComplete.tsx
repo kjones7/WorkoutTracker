@@ -4,9 +4,17 @@ import { Card } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { exercises } from "../data/exercises";
 import type { Exercise } from "../lib/types";
+import { getWorkouts } from "../lib/database";
+import { useEffect, useState } from "react";
 
 export function WorkoutComplete() {
   const [, setLocation] = useLocation();
+  const [completedWorkout, setCompletedWorkout] = useState<any>(null);
+
+  useEffect(() => {
+    const workout = JSON.parse(sessionStorage.getItem("completedWorkout") || "{}");
+    setCompletedWorkout(workout);
+  }, []);
 
   return (
     <div className="min-h-screen p-4 flex flex-col items-center justify-center">
@@ -21,9 +29,8 @@ export function WorkoutComplete() {
 
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Workout Summary</h2>
-          {/* Summary details will be populated from session storage */}
           <div className="space-y-2 text-sm text-gray-600">
-            {JSON.parse(sessionStorage.getItem("completedWorkout") || "{}").exercises?.map((exercise: any, index: number) => {
+            {completedWorkout?.exercises?.map((exercise: any, index: number) => {
               const completedSets = exercise.sets.filter((set: any) => set.completed).length;
               const exerciseDetails = exercises.find((e: Exercise) => e.id === exercise.exerciseId);
               return (

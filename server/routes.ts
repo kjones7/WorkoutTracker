@@ -1,8 +1,6 @@
 import type { Express } from "express";
-
 import { db } from "@db/index";
 import { workouts, workoutExercises, exerciseSets } from "@db/schema";
-import type { Express } from "express";
 
 export function registerRoutes(app: Express) {
   app.post("/api/workouts", async (req, res) => {
