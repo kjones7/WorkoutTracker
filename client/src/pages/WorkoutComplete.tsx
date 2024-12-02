@@ -2,6 +2,8 @@ import { CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLocation } from "wouter";
+import { exercises } from "../data/exercises";
+import type { Exercise } from "../lib/types";
 
 export function WorkoutComplete() {
   const [, setLocation] = useLocation();
@@ -23,7 +25,7 @@ export function WorkoutComplete() {
           <div className="space-y-2 text-sm text-gray-600">
             {JSON.parse(sessionStorage.getItem("completedWorkout") || "{}").exercises?.map((exercise: any, index: number) => {
               const completedSets = exercise.sets.filter((set: any) => set.completed).length;
-              const exerciseDetails = exercises.find(e => e.id === exercise.exerciseId);
+              const exerciseDetails = exercises.find((e: Exercise) => e.id === exercise.exerciseId);
               return (
                 <div key={index} className="flex justify-between items-center">
                   <span>{exerciseDetails?.name}</span>
