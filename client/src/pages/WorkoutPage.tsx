@@ -2,7 +2,7 @@ import { Plus, MoreVertical, CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "../components/BottomNav";
-import { workoutTemplates, exampleTemplates } from "../data/templates";
+import { workoutTemplates } from "../data/templates";
 import { exercises } from "../data/exercises";
 
 export function WorkoutPage() {
@@ -62,13 +62,6 @@ export function WorkoutPage() {
           <h3 className="text-base font-medium">My Templates ({workoutTemplates.length})</h3>
           <div className="space-y-3">
             {workoutTemplates.map((template) => (
-              <TemplateCard key={template.id} template={template} />
-            ))}
-          </div>
-
-          <h3 className="text-base font-medium">Example Templates ({exampleTemplates.length})</h3>
-          <div className="space-y-3">
-            {exampleTemplates.map((template) => (
               <TemplateCard key={template.id} template={template} />
             ))}
           </div>
