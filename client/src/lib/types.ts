@@ -11,3 +11,17 @@ export interface Exercise {
   duration?: string;
   illustration: string;
 }
+
+export interface WorkoutTemplate {
+  id: string;
+  name: string;
+  exercises: Array<{
+    exerciseId: string;
+    sets: number;
+    reps?: number;
+    weight?: number;
+    duration?: string;
+  }>;
+  lastModified: Date;
+  isExample?: boolean;
+}
