@@ -46,19 +46,36 @@ export function registerRoutes(app: Express) {
         workoutKeys.map(async (key) => {
           try {
             const workout = await db.get(key);
-            if (!workout || typeof workout !== 'object') {
-              console.warn(`Skipping invalid workout data for key: ${key}`);
+            
+            // Type guard function to validate WorkoutData
+            const isWorkoutData = (data: any): data is WorkoutData => {
+              return (
+                data &&
+                typeof data === 'object' &&
+                typeof data.name === 'string' &&
+                Array.isArray(data.exercises) &&
+                typeof data.completedAt === 'string' &&
+                data.exercises.every((exercise: any) =>
+                  typeof exercise === 'object' &&
+                  typeof exercise.exerciseId === 'string' &&
+                  Array.isArray(exercise.sets) &&
+                  exercise.sets.every((set: any) =>
+                    typeof set === 'object' &&
+                    typeof set.completed === 'boolean' &&
+                    (set.weight === undefined || typeof set.weight === 'number') &&
+                    (set.reps === undefined || typeof set.reps === 'number') &&
+                    (set.time === undefined || typeof set.time === 'string')
+                  )
+                )
+              );
+            };
+
+            if (!isWorkoutData(workout)) {
+              console.warn(`Invalid or malformed workout data for key: ${key}`);
               return null;
             }
             
-            // Validate the workout data structure
-            const workoutData = workout as WorkoutData;
-            if (!workoutData.name || !Array.isArray(workoutData.exercises) || !workoutData.completedAt) {
-              console.warn(`Skipping malformed workout data for key: ${key}`);
-              return null;
-            }
-            
-            return workoutData;
+            return workout;
           } catch (err) {
             console.warn(`Error processing workout ${key}:`, err);
             return null;
