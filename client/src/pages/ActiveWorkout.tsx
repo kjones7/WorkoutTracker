@@ -108,7 +108,7 @@ export function ActiveWorkout() {
 
   return (
     <div className="min-h-screen pb-16">
-      <div className="sticky top-0 bg-white z-10">
+      <div className="bg-white">
         <div className="flex justify-between items-center p-4">
           <Button variant="ghost" size="icon" className="h-10 w-10">
             <RotateCcw className="h-5 w-5 text-gray-500" />
