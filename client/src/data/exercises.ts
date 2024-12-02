@@ -3,6 +3,15 @@ import { Exercise } from '../lib/types';
 export const exercises: Exercise[] = [
   {
     id: '1',
+    name: 'Seated Overhead Press',
+    bodyPart: 'Shoulders',
+    category: 'Barbell',
+    weight: 95,
+    reps: 8,
+    illustration: '/icons/shoulder-press.svg'
+  },
+  {
+    id: '2',
     name: 'Bicep Curl',
     bodyPart: 'Arms',
     category: 'Barbell',
@@ -11,67 +20,50 @@ export const exercises: Exercise[] = [
     illustration: '/icons/bicep-curl.svg'
   },
   {
-    id: '2',
-    name: 'Hanging Leg Raise',
-    bodyPart: 'Core',
-    category: 'Bodyweight',
-    reps: 8,
-    illustration: '/icons/leg-raise.svg'
-  },
-  {
     id: '3',
-    name: 'Triceps Extension',
-    bodyPart: 'Arms',
-    category: 'Dumbbell',
-    weight: 12.5,
-    reps: 10,
-    illustration: '/icons/tricep-extension.svg'
+    name: 'Plank',
+    bodyPart: 'Core',
+    category: 'Duration',
+    duration: '1:00',
+    illustration: '/icons/plank.svg'
   },
   {
     id: '4',
-    name: 'Stiff Leg Deadlift',
-    bodyPart: 'Back',
-    category: 'Barbell',
-    weight: 45,
-    reps: 10,
-    illustration: '/icons/deadlift.svg'
-  },
-  {
-    id: '5',
-    name: 'Deadlift',
-    bodyPart: 'Back',
-    category: 'Barbell',
-    weight: 145,
-    reps: 5,
-    illustration: '/icons/deadlift.svg'
-  },
-  {
-    id: '6',
     name: 'Front Squat',
     bodyPart: 'Legs',
     category: 'Barbell',
-    weight: 75,
-    reps: 4,
+    weight: 135,
+    reps: 6,
     illustration: '/icons/squat.svg'
+  },
+  {
+    id: '5',
+    name: 'Lunge',
+    bodyPart: 'Legs',
+    category: 'Dumbbell',
+    weight: 20,
+    reps: 12,
+    illustration: '/icons/lunge.svg'
+  },
+  {
+    id: '6',
+    name: 'Shrug',
+    bodyPart: 'Shoulders',
+    category: 'Barbell',
+    weight: 135,
+    reps: 12,
+    illustration: '/icons/shrug.svg'
   },
   {
     id: '7',
     name: 'Ab Wheel',
     bodyPart: 'Core',
-    category: 'Bodyweight',
-    reps: 7,
+    category: 'Duration',
+    duration: '0:45',
     illustration: '/icons/ab-wheel.svg'
   },
   {
     id: '8',
-    name: 'Plank',
-    bodyPart: 'Core',
-    category: 'Bodyweight',
-    duration: '0:30',
-    illustration: '/icons/plank.svg'
-  },
-  {
-    id: '9',
     name: 'Bench Press',
     bodyPart: 'Chest',
     category: 'Barbell',
@@ -80,108 +72,48 @@ export const exercises: Exercise[] = [
     illustration: '/icons/bench-press.svg'
   },
   {
-    id: '10',
-    name: 'Shoulder Press',
-    bodyPart: 'Shoulders',
+    id: '9',
+    name: 'Bent Over One Arm Row',
+    bodyPart: 'Back',
     category: 'Dumbbell',
-    weight: 25,
-    reps: 12,
-    illustration: '/icons/shoulder-press.svg'
+    weight: 40,
+    reps: 10,
+    illustration: '/icons/row.svg'
+  },
+  {
+    id: '10',
+    name: 'Decline Crunch',
+    bodyPart: 'Core',
+    category: 'Weighted Bodyweight',
+    weight: 10,
+    reps: 15,
+    illustration: '/icons/crunch.svg'
   },
   {
     id: '11',
-    name: 'Lat Pulldown',
-    bodyPart: 'Back',
-    category: 'Cable',
-    weight: 100,
-    reps: 12,
-    illustration: '/icons/lat-pulldown.svg'
-  },
-  {
-    id: '12',
-    name: 'Leg Press',
-    bodyPart: 'Legs',
-    category: 'Machine',
-    weight: 200,
-    reps: 10,
-    illustration: '/icons/leg-press.svg'
-  },
-  {
-    id: '13',
-    name: 'Push-ups',
-    bodyPart: 'Chest',
-    category: 'Bodyweight',
-    reps: 15,
-    illustration: '/icons/push-up.svg'
-  },
-  {
-    id: '14',
-    name: 'Cable Flyes',
-    bodyPart: 'Chest',
-    category: 'Cable',
-    weight: 30,
-    reps: 15,
-    illustration: '/icons/cable-fly.svg'
-  },
-  {
-    id: '15',
-    name: 'Face Pull',
-    bodyPart: 'Shoulders',
-    category: 'Cable',
-    weight: 25,
-    reps: 15,
-    illustration: '/icons/face-pull.svg'
-  },
-  {
-    id: '16',
-    name: 'Romanian Deadlift',
+    name: 'Deadlift',
     bodyPart: 'Back',
     category: 'Barbell',
-    weight: 135,
-    reps: 10,
+    weight: 185,
+    reps: 5,
     illustration: '/icons/deadlift.svg'
   },
   {
-    id: '17',
-    name: 'Leg Extension',
-    bodyPart: 'Legs',
-    category: 'Machine',
-    weight: 70,
-    reps: 12,
-    illustration: '/icons/leg-extension.svg'
-  },
-  {
-    id: '18',
-    name: 'Hammer Curls',
+    id: '12',
+    name: 'Triceps Extension',
     bodyPart: 'Arms',
-    category: 'Dumbbell',
-    weight: 20,
-    reps: 12,
-    illustration: '/icons/hammer-curl.svg'
-  },
-  {
-    id: '19',
-    name: 'Side Lateral Raise',
-    bodyPart: 'Shoulders',
     category: 'Dumbbell',
     weight: 15,
     reps: 12,
-    illustration: '/icons/lateral-raise.svg'
+    illustration: '/icons/tricep-extension.svg'
   },
   {
-    id: '20',
-    name: 'Pull-ups',
-    bodyPart: 'Back',
-    category: 'Bodyweight',
-    reps: 8,
-    illustration: '/icons/pull-up.svg'
-  },
-  {
-    id: '21',
-    name: 'Russian Twist',
+    id: '13',
+    name: 'Hanging Leg Raise',
     bodyPart: 'Core',
-    category: 'Bodyweight',
-    reps: 20,
-    illustration: '/icons/russian-twist.svg'
+    category: 'Weighted Bodyweight',
+    weight: 5,
+    reps: 10,
+    illustration: '/icons/leg-raise.svg'
   }
 ];
