@@ -27,12 +27,7 @@ export function ActiveWorkout() {
   const [activeExercises, setActiveExercises] = useState<ActiveExercise[]>(() => 
     workout?.exercises.map(e => ({
       exerciseId: e.exerciseId,
-      sets: Array(e.sets).fill({
-        weight: undefined,
-        reps: undefined,
-        time: undefined,
-        completed: false
-      })
+      sets: [] // Start with empty array, will be populated when adding sets
     })) ?? []
   );
 
@@ -144,13 +139,13 @@ export function ActiveWorkout() {
                 <div className="grid grid-cols-[auto_1fr_1fr_1fr_auto] gap-2 px-4 py-2 bg-gray-100">
                   <div className="text-sm font-medium text-gray-500">Set</div>
                   <div className="text-sm font-medium text-gray-500">Previous</div>
-                  {activeExercise.sets[0]?.weight !== undefined ? (
+                  {exercises.find(e => e.id === activeExercise.exerciseId)?.category === 'Duration' ? (
+                    <div className="text-sm font-medium text-gray-500 col-span-2">Time</div>
+                  ) : (
                     <>
                       <div className="text-sm font-medium text-gray-500">lbs</div>
                       <div className="text-sm font-medium text-gray-500">Reps</div>
                     </>
-                  ) : (
-                    <div className="text-sm font-medium text-gray-500 col-span-2">Time</div>
                   )}
                   <div></div>
                 </div>
