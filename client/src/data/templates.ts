@@ -95,6 +95,12 @@ export const workoutTemplates: WorkoutTemplate[] = [
         weight: 185
       },
       {
+        exerciseId: findExercise('14')?.id ?? '', // Stiff Leg Deadlift
+        sets: 3,
+        reps: 8,
+        weight: 135
+      },
+      {
         exerciseId: findExercise('12')?.id ?? '', // Triceps Extension
         sets: 3,
         reps: 12,

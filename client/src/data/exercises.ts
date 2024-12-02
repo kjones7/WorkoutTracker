@@ -115,5 +115,14 @@ export const exercises: Exercise[] = [
     weight: 5,
     reps: 10,
     illustration: '/icons/leg-raise.svg'
+  },
+  {
+    id: '14',
+    name: 'Stiff Leg Deadlift',
+    bodyPart: 'Back',
+    category: 'Barbell',
+    weight: 135,
+    reps: 8,
+    illustration: '/icons/stiff-leg-deadlift.svg'
   }
 ];
