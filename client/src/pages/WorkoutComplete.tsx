@@ -27,6 +27,16 @@ export function WorkoutComplete() {
           </p>
         </div>
 
+        <Button 
+          className="w-full"
+          onClick={() => {
+            sessionStorage.removeItem("activeWorkout");
+            setLocation("/");
+          }}
+        >
+          Return to Workout Page
+        </Button>
+
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Workout Summary</h2>
           <div className="space-y-2 text-sm text-gray-600">
@@ -42,16 +52,6 @@ export function WorkoutComplete() {
             })}
           </div>
         </div>
-
-        <Button 
-          className="w-full"
-          onClick={() => {
-            sessionStorage.removeItem("activeWorkout");
-            setLocation("/");
-          }}
-        >
-          Return to Workout Page
-        </Button>
       </Card>
     </div>
   );
