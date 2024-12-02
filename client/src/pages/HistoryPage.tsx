@@ -17,6 +17,7 @@ import {
 export function HistoryPage() {
   const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
   const [selectedWorkout, setSelectedWorkout] = useState<string | null>(null);
+  const [openDropdownId, setOpenDropdownId] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleDeleteWorkout = async (workoutId: string) => {
@@ -43,6 +44,7 @@ export function HistoryPage() {
       });
     } finally {
       setSelectedWorkout(null);
+      setOpenDropdownId(null);
     }
   };
 
@@ -142,11 +144,14 @@ export function HistoryPage() {
               <Card key={index} className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="font-semibold text-lg">{workout.name}</h2>
-                  <DropdownMenu onOpenChange={() => {
-                    if (selectedWorkout) {
-                      setSelectedWorkout(null);
-                    }
-                  }}>
+                  <DropdownMenu
+                    open={openDropdownId === workout.id}
+                    onOpenChange={(open) => {
+                      setOpenDropdownId(open ? workout.id : null);
+                      if (!open) {
+                        setSelectedWorkout(null);
+                      }
+                    }}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="h-8 w-8">
                         <MoreVertical className="h-4 w-4" />
