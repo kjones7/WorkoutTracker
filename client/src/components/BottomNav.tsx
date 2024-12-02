@@ -1,15 +1,14 @@
-import { User, History, Dumbbell, List, Crown } from "lucide-react";
+import { User, History, Dumbbell, List } from "lucide-react";
 import { Link, useLocation } from "wouter";
 
 export function BottomNav() {
   const [location] = useLocation();
 
   const navItems = [
-    { icon: User, label: "Profile", path: "/profile" },
-    { icon: History, label: "History", path: "/history" },
     { icon: Dumbbell, label: "Workout", path: "/workout" },
     { icon: List, label: "Exercises", path: "/" },
-    { icon: Crown, label: "Upgrade", path: "/upgrade" },
+    { icon: History, label: "History", path: "/history" },
+    { icon: User, label: "Profile", path: "/profile" },
   ];
 
   return (
