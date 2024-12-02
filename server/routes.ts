@@ -35,65 +35,28 @@ export function registerRoutes(app: Express) {
   app.get("/api/workouts", async (_req, res) => {
     try {
       // Get all keys with prefix 'workout:'
-      const dbList = await db.list();
+      const dbList = await db.list('workout:');
       console.log('Raw database keys:', dbList);
 
-      if (!dbList || !dbList.value) {
-        console.log('No database list or value found');
+      if (!dbList || !Array.isArray(dbList)) {
+        console.log('No valid database list found');
         return res.json([]);
       }
-      
-      const workoutKeys = dbList.value.filter(key => key.startsWith('workout:'));
-      console.log('Filtered workout keys:', workoutKeys);
-      
-      if (!workoutKeys.length) {
-        console.log('No workout keys found');
-        return res.json([]); // Return empty array if no workouts found
-      }
-
+    
       const workouts = await Promise.all(
-        workoutKeys.map(async (key) => {
+        dbList.map(async (key) => {
           try {
             const workout = await db.get(key);
-            console.log('Retrieved workout:', workout);
             
-            // Extract the actual workout data from the nested structure
-            const workoutData = workout.value || workout;
-            console.log(`Retrieved workout data for key ${key}:`, workoutData);
-            
-            // Type guard function to validate WorkoutData
-            const isWorkoutData = (data: any): data is WorkoutData => {
-              if (!data) return false;
-              
-              // If we have a nested structure, use the value property
-              const workoutData = data.value || data;
-              
-              return (
-                typeof workoutData === 'object' &&
-                typeof workoutData.name === 'string' &&
-                Array.isArray(workoutData.exercises) &&
-                typeof workoutData.completedAt === 'string' &&
-                workoutData.exercises.every((exercise: any) =>
-                  typeof exercise === 'object' &&
-                  typeof exercise.exerciseId === 'string' &&
-                  Array.isArray(exercise.sets) &&
-                  exercise.sets.every((set: any) =>
-                    typeof set === 'object' &&
-                    typeof set.completed === 'boolean' &&
-                    (set.weight === undefined || typeof set.weight === 'number') &&
-                    (set.reps === undefined || typeof set.reps === 'number') &&
-                    (set.time === undefined || typeof set.time === 'string')
-                  )
-                )
-              );
-            };
-
-            if (!isWorkoutData(workoutData)) {
-              console.warn(`Invalid or malformed workout data for key: ${key}`);
+            // If we get a 404 or null, this workout was deleted
+            if (!workout || workout?.error?.statusCode === 404) {
               return null;
             }
             
-            return workoutData;
+            return {
+              ...workout,
+              completedAt: key.replace('workout:', '')
+            };
           } catch (err) {
             console.warn(`Error processing workout ${key}:`, err);
             return null;
@@ -101,14 +64,9 @@ export function registerRoutes(app: Express) {
         })
       );
 
-      // Explicitly type the filtered workouts array
       const validWorkouts = workouts
-        .filter((workout): workout is NonNullable<typeof workout> => workout !== null)
-        .sort((a, b) => {
-          // Add null checks for TypeScript
-          if (!a || !b) return 0;
-          return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
-        });
+        .filter((w): w is NonNullable<typeof w> => w !== null)
+        .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
 
       console.log('Final processed workouts:', validWorkouts);
       res.json(validWorkouts);
