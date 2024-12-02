@@ -124,12 +124,25 @@ export function registerRoutes(app: Express) {
       const key = keyParam.startsWith('workout:') ? keyParam : `workout:${keyParam}`;
       console.log('Formatted key for deletion:', key);
       
+      // Get current value before deletion
+      const beforeDelete = await db.get(key);
+      console.log('Value before deletion:', beforeDelete);
+      
       // Perform deletion
       await db.delete(key);
+      console.log('Delete operation completed');
+      
+      // Try setting the value to null first
+      await db.set(key, null);
+      console.log('Set to null completed');
+      
+      // Delete again
+      await db.delete(key);
+      console.log('Second delete completed');
       
       // Verify deletion
       const verifyDeletion = await db.get(key);
-      console.log('Verification after deletion - key exists?:', !!verifyDeletion);
+      console.log('Verification after deletion - value:', verifyDeletion);
       
       if (verifyDeletion) {
         throw new Error('Workout was not deleted successfully');
