@@ -142,8 +142,8 @@ export function HistoryPage() {
               <Card key={index} className="p-4">
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="font-semibold text-lg">{workout.name}</h2>
-                  <DropdownMenu onOpenChange={() => {
-                    if (selectedWorkout) {
+                  <DropdownMenu onOpenChange={(open) => {
+                    if (!open || selectedWorkout) {
                       setSelectedWorkout(null);
                     }
                   }}>
