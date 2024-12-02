@@ -49,10 +49,38 @@ export function ActiveWorkout() {
     });
   };
 
-  const handleFinish = () => {
-    // TODO: Save workout history
-    sessionStorage.removeItem("activeWorkout");
-    setLocation("/workout-complete");
+  const handleFinish = async () => {
+    try {
+      // Save workout to database
+      const response = await fetch('/api/workouts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: workout.name,
+          exercises: activeExercises,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save workout');
+      }
+
+      // Store the completed workout data for display on the completion page
+      const workoutData = {
+        name: workout.name,
+        exercises: activeExercises,
+        completedAt: new Date().toISOString(),
+      };
+      sessionStorage.setItem("completedWorkout", JSON.stringify(workoutData));
+      sessionStorage.removeItem("activeWorkout");
+      
+      setLocation("/workout-complete");
+    } catch (error) {
+      console.error('Error saving workout:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   if (!workout) {

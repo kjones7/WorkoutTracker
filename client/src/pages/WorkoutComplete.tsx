@@ -21,12 +21,16 @@ export function WorkoutComplete() {
           <h2 className="text-lg font-semibold">Workout Summary</h2>
           {/* Summary details will be populated from session storage */}
           <div className="space-y-2 text-sm text-gray-600">
-            {JSON.parse(sessionStorage.getItem("activeWorkout") || "{}").exercises?.map((exercise: any, index: number) => (
-              <div key={index} className="flex justify-between items-center">
-                <span>{exercise.name}</span>
-                <span>{exercise.sets} sets</span>
-              </div>
-            ))}
+            {JSON.parse(sessionStorage.getItem("completedWorkout") || "{}").exercises?.map((exercise: any, index: number) => {
+              const completedSets = exercise.sets.filter((set: any) => set.completed).length;
+              const exerciseDetails = exercises.find(e => e.id === exercise.exerciseId);
+              return (
+                <div key={index} className="flex justify-between items-center">
+                  <span>{exerciseDetails?.name}</span>
+                  <span>{completedSets} sets completed</span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
