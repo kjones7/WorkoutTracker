@@ -1,9 +1,11 @@
 import type { Express } from "express";
 import Database from "@replit/database";
+import { v4 as uuid } from "uuid";
 
 const db = new Database();
 
 interface WorkoutData {
+  id: string;
   name: string;
   exercises: Array<{
     exerciseId: string;
@@ -20,9 +22,12 @@ interface WorkoutData {
 export function registerRoutes(app: Express) {
   app.post("/api/workouts", async (req, res) => {
     try {
-      const workoutData: WorkoutData = req.body;
-      const timestamp = new Date().getTime();
-      const key = `workout:${timestamp}`;
+      const workoutId = uuid();
+      const workoutData: WorkoutData = {
+        ...req.body,
+        id: workoutId,
+      };
+      const key = `workout:${workoutId}`;
 
       await db.set(key, workoutData);
       res.json({ message: "Workout saved successfully", key });

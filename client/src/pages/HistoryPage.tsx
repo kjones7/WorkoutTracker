@@ -19,16 +19,11 @@ export function HistoryPage() {
   const [selectedWorkout, setSelectedWorkout] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleDeleteWorkout = async (key: string) => {
+  const handleDeleteWorkout = async (workoutId: string) => {
     try {
-      // Convert ISO timestamp to milliseconds if needed
-      const timestamp = key.startsWith('workout:') 
-        ? key.replace('workout:', '')
-        : new Date(key).getTime().toString();
-      
-      const formattedKey = `workout:${timestamp}`;
-      console.log("Attempting to delete workout with key:", formattedKey);
-      await deleteWorkout(formattedKey);
+      const key = `workout:${workoutId}`;
+      console.log("Attempting to delete workout with key:", key);
+      await deleteWorkout(key);
 
       // Only update UI state if the database deletion was successful
       setWorkouts((prevWorkouts) =>
@@ -158,7 +153,7 @@ export function HistoryPage() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem
                         className="text-red-600 focus:text-red-600"
-                        onClick={() => setSelectedWorkout(workout.completedAt)}
+                        onClick={() => setSelectedWorkout(workout.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete Workout

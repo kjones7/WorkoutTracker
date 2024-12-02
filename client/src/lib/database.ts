@@ -1,4 +1,5 @@
 export interface WorkoutData {
+  id: string;
   name: string;
   exercises: Array<{
     exerciseId: string;
