@@ -1,7 +1,3 @@
-import Database from "@replit/database";
-
-const db = new Database();
-
 export interface WorkoutData {
   name: string;
   exercises: Array<{
@@ -16,22 +12,29 @@ export interface WorkoutData {
   completedAt: string;
 }
 
-export const saveWorkout = async (workoutData: WorkoutData) => {
-  const timestamp = new Date().getTime();
-  const key = `workout:${timestamp}`;
-  await db.set(key, workoutData);
-  return key;
+export const saveWorkout = async (workoutData: WorkoutData): Promise<string> => {
+  const response = await fetch('/api/workouts', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(workoutData),
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to save workout');
+  }
+
+  const result = await response.json();
+  return result.key;
 };
 
 export const getWorkouts = async (): Promise<WorkoutData[]> => {
-  const keys = await db.list("workout:");
-  const workouts = await Promise.all(
-    keys.map(async (key) => {
-      const workout = await db.get(key);
-      return workout as WorkoutData;
-    })
-  );
-  return workouts.sort((a: WorkoutData, b: WorkoutData) => 
-    new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
-  );
+  const response = await fetch('/api/workouts');
+  
+  if (!response.ok) {
+    throw new Error('Failed to retrieve workouts');
+  }
+
+  return response.json();
 };
