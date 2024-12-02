@@ -70,6 +70,7 @@ export function registerRoutes(app: Express) {
 
       const validWorkouts = workouts
         .filter((w): w is NonNullable<typeof w> => w !== null)
+        .map(w => w.value) // Extract the workout data from the response
         .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
 
       console.log('Final processed workouts:', validWorkouts);

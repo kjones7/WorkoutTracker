@@ -133,7 +133,8 @@ export function HistoryPage() {
         </div>
 
         <div className="space-y-4">
-          {workouts.map((workout, index) => {
+          {workouts?.map((workout, index) => {
+            if (!workout || !workout.exercises) return null;
             const { day, date } = formatDate(workout.completedAt);
             const stats = calculateWorkoutStats(workout);
             
