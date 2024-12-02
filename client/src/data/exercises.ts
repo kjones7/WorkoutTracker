@@ -119,7 +119,7 @@ export const exercises: Exercise[] = [
   {
     id: '14',
     name: 'Stiff Leg Deadlift',
-    bodyPart: 'Legs',
+    bodyPart: 'Back',
     category: 'Barbell',
     weight: 135,
     reps: 8,
