@@ -7,10 +7,7 @@ import { exercises } from "../data/exercises";
 import { useLocation } from "wouter";
 
 export function WorkoutPage() {
-  const handleStartEmptyWorkout = () => {
-    // TODO: Implement empty workout logic
-    console.log("Starting empty workout");
-  };
+  
 
   const formatTimeAgo = (date: Date) => {
     const days = Math.round((new Date().getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
@@ -54,15 +51,7 @@ export function WorkoutPage() {
       <div className="p-4 space-y-6">
         <h1 className="text-2xl font-bold">Start Workout</h1>
         
-        <section>
-          <h2 className="text-lg font-semibold mb-3">Quick Start</h2>
-          <Button 
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white"
-            onClick={handleStartEmptyWorkout}
-          >
-            Start an Empty Workout
-          </Button>
-        </section>
+        
 
         <section className="space-y-3">
           <div className="flex justify-between items-center">
