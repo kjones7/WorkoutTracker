@@ -20,18 +20,6 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
         <h3 className="font-semibold text-base">{exercise.name}</h3>
         <p className="text-sm text-gray-500">{exercise.bodyPart}</p>
       </div>
-      
-      <div className="text-right text-sm text-gray-600">
-        {exercise.weight && exercise.reps && (
-          <span>{exercise.weight} lb (x{exercise.reps})</span>
-        )}
-        {exercise.reps && !exercise.weight && (
-          <span>{exercise.reps} reps</span>
-        )}
-        {exercise.duration && (
-          <span>{exercise.duration}</span>
-        )}
-      </div>
     </Card>
   );
 }
