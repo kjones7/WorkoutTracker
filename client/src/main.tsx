@@ -10,7 +10,7 @@ import { WorkoutPage } from "./pages/WorkoutPage";
 import { ActiveWorkout } from "./pages/ActiveWorkout";
 import { WorkoutComplete } from "./pages/WorkoutComplete";
 import { HistoryPage } from "./pages/HistoryPage";
-import { BottomNav } from "./components/BottomNav";
+import { BottomNav } from "./components/features/BottomNav";
 
 function Router() {
   return (

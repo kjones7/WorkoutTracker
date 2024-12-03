@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BodyPart, Category } from "../lib/types";
+import { BodyPart, Category } from "@/lib/types";
 
 interface FilterButtonsProps {
   selectedBodyPart: BodyPart | 'Any';
