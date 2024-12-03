@@ -23,28 +23,49 @@ export function HistoryPage() {
   const handleDeleteWorkout = async (workoutId: string) => {
     try {
       const key = `workout:${workoutId}`;
-      console.log("Attempting to delete workout with key:", key);
-      await deleteWorkout(key);
-
-      // Only update UI state if the database deletion was successful
-      setWorkouts((prevWorkouts) =>
-        prevWorkouts.filter((workout) => workout.id !== workoutId)
+      
+      // First, set the isDeleting flag to trigger the animation
+      setWorkouts(prevWorkouts =>
+        prevWorkouts.map(workout =>
+          workout.id === workoutId ? { ...workout, isDeleting: true } : workout
+        )
       );
 
-      toast({
-        title: "Success",
-        description: "Workout deleted successfully",
-      });
+      // Wait for animation to complete before deleting from database
+      setTimeout(async () => {
+        try {
+          await deleteWorkout(key);
+          
+          // After successful deletion, remove from state
+          setWorkouts(prevWorkouts =>
+            prevWorkouts.filter(workout => workout.id !== workoutId)
+          );
+          
+          toast({
+            title: "Success",
+            description: "Workout deleted successfully",
+          });
+        } catch (error) {
+          console.error("Error deleting workout:", error);
+          toast({
+            title: "Error",
+            description: "Failed to delete workout. Please try again.",
+            variant: "destructive",
+          });
+          
+          // Revert the deletion animation if there's an error
+          setWorkouts(prevWorkouts =>
+            prevWorkouts.map(workout =>
+              workout.id === workoutId ? { ...workout, isDeleting: false } : workout
+            )
+          );
+        } finally {
+          setSelectedWorkout(null);
+        }
+      }, 300); // Match this with the CSS transition duration
     } catch (error) {
-      console.error("Error deleting workout:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete workout. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
+      console.error("Error in delete process:", error);
       setSelectedWorkout(null);
-      setOpenDropdownId(null);
     }
   };
 
@@ -141,7 +162,12 @@ export function HistoryPage() {
             const stats = calculateWorkoutStats(workout);
 
             return (
-              <Card key={index} className="p-4">
+              <Card 
+                key={workout.id} 
+                className={`p-4 w-full max-w-3xl mx-auto transition-all duration-300 ease-in-out transform ${
+                  workout.isDeleting ? 'opacity-0 -translate-x-full' : 'opacity-100 translate-x-0'
+                }`}
+              >
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="font-semibold text-lg">{workout.name}</h2>
                   <DropdownMenu
@@ -163,7 +189,8 @@ export function HistoryPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          setSelectedWorkout(workout.id);
+                          setOpenDropdownId(null);
+                          setSelectedWorkout(workout.id); // Show confirmation modal
                         }}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -270,9 +297,11 @@ export function HistoryPage() {
       <ConfirmDialog
         isOpen={!!selectedWorkout}
         onClose={() => setSelectedWorkout(null)}
-        onConfirm={() =>
-          selectedWorkout && handleDeleteWorkout(selectedWorkout)
-        }
+        onConfirm={() => {
+          if (selectedWorkout) {
+            handleDeleteWorkout(selectedWorkout);
+          }
+        }}
         title="Delete Workout"
         description="Are you sure you want to delete this workout? This action cannot be undone."
       />
