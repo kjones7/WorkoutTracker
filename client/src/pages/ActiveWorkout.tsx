@@ -51,7 +51,9 @@ export function ActiveWorkout() {
     }
 
     try {
+      const { v4: uuid } = await import('uuid');
       const workoutData = {
+        id: uuid(),
         name: workout.name,
         exercises: activeExercises,
         completedAt: new Date().toISOString(),
@@ -192,9 +194,15 @@ export function ActiveWorkout() {
                   className="w-full py-2 text-sm text-blue-600 hover:bg-gray-100 transition-colors border-t border-gray-200"
                   onClick={() => {
                     const exercise = exercises.find(e => e.id === activeExercise.exerciseId);
-                    const newSet: WorkoutSet = exercise?.category === 'Duration'
-                      ? { time: '', completed: false }
-                      : { weight: undefined, reps: undefined, completed: false };
+                    if (!exercise) return;
+
+                    let newSet: WorkoutSet;
+                    if (exercise.category === 'Duration') {
+                      newSet = { time: '', completed: false };
+                    } else {
+                      // For Barbell, Dumbbell, and Weighted Bodyweight exercises
+                      newSet = { weight: 0, reps: 0, completed: false };
+                    }
                     
                     setActiveExercises(prev => {
                       const updated = [...prev];
