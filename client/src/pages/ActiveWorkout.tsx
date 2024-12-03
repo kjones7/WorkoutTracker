@@ -7,6 +7,7 @@ import { exercises } from "../data/exercises";
 import { useRestTimer } from "../hooks/useRestTimer";
 
 interface WorkoutSet {
+  id: number;
   weight?: number;
   reps?: number;
   time?: string;
@@ -228,11 +229,12 @@ export function ActiveWorkout() {
                       size="sm"
                       className="w-8 h-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
                       onClick={() => {
+                        const setToDelete = activeExercise.sets[setIndex];
                         setActiveExercises(prev => {
                           const updated = [...prev];
                           updated[exerciseIndex] = {
                             ...updated[exerciseIndex],
-                            sets: updated[exerciseIndex].sets.filter((_, idx) => idx !== setIndex)
+                            sets: updated[exerciseIndex].sets.filter(set => set.id !== setToDelete.id)
                           };
                           return updated;
                         });
@@ -250,10 +252,10 @@ export function ActiveWorkout() {
 
                     let newSet: WorkoutSet;
                     if (exercise.category === 'Duration') {
-                      newSet = { time: '', completed: false };
+                      newSet = { id: Date.now(), time: '', completed: false };
                     } else {
                       // For Barbell, Dumbbell, and Weighted Bodyweight exercises
-                      newSet = { weight: 0, reps: 0, completed: false };
+                      newSet = { id: Date.now(), weight: 0, reps: 0, completed: false };
                     }
                     
                     setActiveExercises(prev => {
