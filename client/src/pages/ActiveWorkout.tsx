@@ -114,7 +114,7 @@ const SetRow: React.FC<SetRowProps> = ({
   onComplete,
 }) => {
   return (
-    <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200">
+    <div className={`grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200 transition-all duration-300 ease-in-out ${set.completed ? 'bg-green-50' : ''}`}>
       <div className="text-sm font-medium w-8">{setIndex + 1}</div>
       {exerciseType === "Duration" ? (
         <input
@@ -148,11 +148,11 @@ const SetRow: React.FC<SetRowProps> = ({
       <Button
         variant={set.completed ? "default" : "ghost"}
         size="sm"
-        className="w-8 h-8 p-0"
+        className={`w-8 h-8 p-0 transition-all duration-300 ease-in-out transform ${set.completed ? 'bg-green-500 hover:bg-green-600 scale-110' : 'hover:bg-green-50 scale-100'}`}
         onClick={() => onComplete(!set.completed)}
       >
         <Check
-          className={`h-4 w-4 ${set.completed ? "text-white" : "text-gray-400"}`}
+          className={`h-4 w-4 transition-all duration-300 ease-in-out ${set.completed ? "text-white scale-100" : "text-gray-400 scale-90 opacity-70"}`}
         />
       </Button>
       <Button
