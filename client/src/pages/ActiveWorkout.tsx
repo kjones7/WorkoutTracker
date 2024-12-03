@@ -190,7 +190,21 @@ export function ActiveWorkout() {
                 ))}
                 <button 
                   className="w-full py-2 text-sm text-blue-600 hover:bg-gray-100 transition-colors border-t border-gray-200"
-                  onClick={() => {/* TODO: Implement add set */}}
+                  onClick={() => {
+                    const exercise = exercises.find(e => e.id === activeExercise.exerciseId);
+                    const newSet: WorkoutSet = exercise?.category === 'Duration'
+                      ? { time: '', completed: false }
+                      : { weight: undefined, reps: undefined, completed: false };
+                    
+                    setActiveExercises(prev => {
+                      const updated = [...prev];
+                      updated[exerciseIndex] = {
+                        ...updated[exerciseIndex],
+                        sets: [...updated[exerciseIndex].sets, newSet]
+                      };
+                      return updated;
+                    });
+                  }}
                 >
                   + Add Set
                 </button>
