@@ -25,3 +25,15 @@ export interface WorkoutTemplate {
   lastModified: Date;
   isExample?: boolean;
 }
+
+export interface WorkoutSet {
+  weight?: number;
+  reps?: number;
+  time?: string;
+  completed: boolean;
+}
+
+export interface ActiveExercise {
+  exerciseId: string;
+  sets: WorkoutSet[];
+}
