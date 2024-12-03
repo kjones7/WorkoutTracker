@@ -23,22 +23,22 @@ export function HistoryPage() {
   const handleDeleteWorkout = async (workoutId: string) => {
     try {
       const key = `workout:${workoutId}`;
-      console.log("Attempting to delete workout with key:", key);
       
-      // Start the deletion animation
+      // First, set the isDeleting flag to trigger the animation
       setWorkouts(prevWorkouts =>
         prevWorkouts.map(workout =>
           workout.id === workoutId ? { ...workout, isDeleting: true } : workout
         )
       );
-      
-      // Wait for the animation duration before actually deleting
+
+      // Wait for animation to complete before deleting from database
       setTimeout(async () => {
         try {
           await deleteWorkout(key);
           
-          setWorkouts((prevWorkouts) =>
-            prevWorkouts.filter((workout) => workout.id !== workoutId)
+          // After successful deletion, remove from state
+          setWorkouts(prevWorkouts =>
+            prevWorkouts.filter(workout => workout.id !== workoutId)
           );
           
           toast({
@@ -52,6 +52,7 @@ export function HistoryPage() {
             description: "Failed to delete workout. Please try again.",
             variant: "destructive",
           });
+          
           // Revert the deletion animation if there's an error
           setWorkouts(prevWorkouts =>
             prevWorkouts.map(workout =>
@@ -163,8 +164,8 @@ export function HistoryPage() {
             return (
               <Card 
                 key={workout.id} 
-                className={`p-4 transition-all duration-300 ease-in-out transform ${
-                  selectedWorkout === workout.id && workout.isDeleting ? 'opacity-0 -translate-x-full' : 'opacity-100 translate-x-0'
+                className={`p-4 w-full max-w-3xl mx-auto transition-all duration-300 ease-in-out transform ${
+                  workout.isDeleting ? 'opacity-0 -translate-x-full' : 'opacity-100 translate-x-0'
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
