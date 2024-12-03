@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Check, MoreVertical, RotateCcw } from "lucide-react";
+import { Check, MoreVertical, RotateCcw, Timer } from "lucide-react";
 import { WorkoutTemplate } from "../lib/types";
 import { exercises } from "../data/exercises";
+import { useRestTimer } from "../hooks/useRestTimer";
 
 interface WorkoutSet {
   weight?: number;
@@ -44,6 +45,8 @@ export function ActiveWorkout() {
     });
   };
 
+  const { timeLeft, isActive, startTimer, stopTimer } = useRestTimer();
+
   const handleSetComplete = (exerciseIndex: number, setIndex: number, completed: boolean) => {
     setActiveExercises(prev => {
       const updated = [...prev];
@@ -55,6 +58,10 @@ export function ActiveWorkout() {
       };
       return updated;
     });
+
+    if (completed) {
+      startTimer();
+    }
   };
 
   const handleFinish = async () => {
@@ -119,6 +126,20 @@ export function ActiveWorkout() {
   return (
     <div className="min-h-screen pb-16">
       <div className="bg-white">
+        {isActive && timeLeft !== null && (
+          <div className="fixed inset-x-0 top-0 bg-blue-500 text-white py-2 px-4 flex items-center justify-center gap-2">
+            <Timer className="h-4 w-4" />
+            <span>Rest Timer: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}</span>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-white hover:text-blue-100"
+              onClick={stopTimer}
+            >
+              Skip
+            </Button>
+          </div>
+        )}
         <div className="flex justify-between items-center p-4">
           <Button variant="ghost" size="icon" className="h-10 w-10">
             <RotateCcw className="h-5 w-5 text-gray-500" />
