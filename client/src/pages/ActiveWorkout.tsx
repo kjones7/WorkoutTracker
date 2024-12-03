@@ -33,6 +33,47 @@ interface ExerciseCardProps {
   onExerciseUpdate: (value: ActiveExercise) => void;
 }
 
+interface PlateCalculatorProps {
+  weight: number;
+}
+
+const PlateCalculator: React.FC<PlateCalculatorProps> = ({ weight }) => {
+  // Standard plate weights in pounds
+  const plateWeights = [45, 35, 25, 10, 5, 2.5];
+  const barWeight = 45; // Standard Olympic barbell weight
+
+  const calculatePlates = (targetWeight: number): number[] => {
+    const plates: number[] = [];
+    let remainingWeight = Math.max(0, targetWeight - barWeight) / 2; // Divide by 2 because plates go on both sides
+
+    plateWeights.forEach(plate => {
+      while (remainingWeight >= plate) {
+        plates.push(plate);
+        remainingWeight -= plate;
+      }
+    });
+
+    return plates;
+  };
+
+  const plates = calculatePlates(weight);
+
+  if (weight < barWeight || !weight) {
+    return null;
+  }
+
+  return (
+    <div className="mt-2 p-2 bg-gray-50 rounded-md text-sm">
+      <div className="font-medium mb-1">Plate Calculator</div>
+      <div className="text-gray-600">
+        Bar weight: {barWeight}lb
+      </div>
+      <div className="text-gray-600">
+        Plates per side: {plates.length > 0 ? plates.map(p => `${p}lb`).join(', ') : 'No plates needed'}
+      </div>
+    </div>
+  );
+};
 interface WorkoutHeaderProps {
   workoutName: string;
   onFinish: () => void;
@@ -167,7 +208,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <MoreVertical className="h-5 w-5 text-gray-500" />
         </button>
       </div>
-      <div className="rounded-lg bg-gray-50 overflow-hidden">
+      {exerciseDetails?.category === "Barbell" && exercise.sets.length > 0 && (
+        <PlateCalculator
+          weight={exercise.sets[exercise.sets.length - 1]?.weight || 0}
+        />
+      )}
+      <div className="rounded-lg bg-gray-50 overflow-hidden mt-2">
         <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 bg-gray-100">
           <div className="text-sm font-medium text-gray-500">Set</div>
           {exerciseDetails?.category === "Duration" ? (
