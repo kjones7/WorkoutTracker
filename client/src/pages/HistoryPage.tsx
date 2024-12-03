@@ -25,12 +25,11 @@ export function HistoryPage() {
       const key = `workout:${workoutId}`;
       console.log("Attempting to delete workout with key:", key);
       
-      // Start the animation
+      // Wait for the animation duration before actually deleting
       setTimeout(async () => {
         try {
           await deleteWorkout(key);
           
-          // Update UI state after database deletion
           setWorkouts((prevWorkouts) =>
             prevWorkouts.filter((workout) => workout.id !== workoutId)
           );
@@ -50,7 +49,6 @@ export function HistoryPage() {
           setSelectedWorkout(null);
         }
       }, 300); // Match this with the CSS transition duration
-      
     } catch (error) {
       console.error("Error in delete process:", error);
       setSelectedWorkout(null);
@@ -177,8 +175,8 @@ export function HistoryPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          setSelectedWorkout(workout.id);
                           setOpenDropdownId(null);
+                          setSelectedWorkout(workout.id);
                         }}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -287,7 +285,6 @@ export function HistoryPage() {
         onClose={() => setSelectedWorkout(null)}
         onConfirm={() => {
           if (selectedWorkout) {
-            // Trigger animation first by maintaining selectedWorkout state
             handleDeleteWorkout(selectedWorkout);
           }
         }}
