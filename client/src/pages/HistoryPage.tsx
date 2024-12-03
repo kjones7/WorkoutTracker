@@ -24,25 +24,39 @@ export function HistoryPage() {
     try {
       const key = `workout:${workoutId}`;
       console.log("Attempting to delete workout with key:", key);
-      await deleteWorkout(key);
-
-      // Only update UI state if the database deletion was successful
-      setWorkouts((prevWorkouts) =>
-        prevWorkouts.filter((workout) => workout.id !== workoutId)
-      );
-
-      toast({
-        title: "Success",
-        description: "Workout deleted successfully",
-      });
+      
+      // First trigger the animation
+      setSelectedWorkout(workoutId);
+      
+      // Wait for animation to complete before deleting from database
+      setTimeout(async () => {
+        try {
+          await deleteWorkout(key);
+          
+          // Update UI state after database deletion
+          setWorkouts((prevWorkouts) =>
+            prevWorkouts.filter((workout) => workout.id !== workoutId)
+          );
+          
+          toast({
+            title: "Success",
+            description: "Workout deleted successfully",
+          });
+        } catch (error) {
+          console.error("Error deleting workout:", error);
+          toast({
+            title: "Error",
+            description: "Failed to delete workout. Please try again.",
+            variant: "destructive",
+          });
+        } finally {
+          setSelectedWorkout(null);
+          setOpenDropdownId(null);
+        }
+      }, 300); // Match this with the CSS transition duration
+      
     } catch (error) {
-      console.error("Error deleting workout:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete workout. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
+      console.error("Error in delete process:", error);
       setSelectedWorkout(null);
       setOpenDropdownId(null);
     }
@@ -141,7 +155,12 @@ export function HistoryPage() {
             const stats = calculateWorkoutStats(workout);
 
             return (
-              <Card key={index} className="p-4">
+              <Card 
+                key={workout.id} 
+                className={`p-4 transition-all duration-300 ease-in-out transform ${
+                  selectedWorkout === workout.id ? 'opacity-0 -translate-x-full' : 'opacity-100 translate-x-0'
+                }`}
+              >
                 <div className="flex justify-between items-start mb-2">
                   <h2 className="font-semibold text-lg">{workout.name}</h2>
                   <DropdownMenu
