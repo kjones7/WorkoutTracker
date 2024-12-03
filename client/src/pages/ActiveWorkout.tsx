@@ -228,16 +228,34 @@ export function ActiveWorkout() {
                       size="sm"
                       className="w-8 h-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
                       onClick={() => {
-                        console.log('Deleting set at index:', setIndex);
-                        console.log('Current sets:', activeExercises[exerciseIndex].sets);
+                        const set = activeExercises[exerciseIndex].sets[setIndex];
+                        console.log(`Attempting to delete set ${setIndex + 1} with values:`, {
+                          weight: set.weight,
+                          reps: set.reps,
+                          time: set.time,
+                          completed: set.completed
+                        });
+                        console.log('Current sets with details:', activeExercises[exerciseIndex].sets.map((s, idx) => ({
+                          setNumber: idx + 1,
+                          weight: s.weight,
+                          reps: s.reps,
+                          time: s.time,
+                          completed: s.completed
+                        })));
                         setActiveExercises(prev => {
                           const updated = [...prev];
-                          console.log('Updated before filter:', updated[exerciseIndex].sets);
+                          const updatedSets = updated[exerciseIndex].sets.filter((_, idx) => idx !== setIndex);
+                          console.log('Sets after deletion:', updatedSets.map((s, idx) => ({
+                            setNumber: idx + 1,
+                            weight: s.weight,
+                            reps: s.reps,
+                            time: s.time,
+                            completed: s.completed
+                          })));
                           updated[exerciseIndex] = {
                             ...updated[exerciseIndex],
-                            sets: updated[exerciseIndex].sets.filter((_, idx) => idx !== setIndex)
+                            sets: updatedSets
                           };
-                          console.log('Updated after filter:', updated[exerciseIndex].sets);
                           return updated;
                         });
                       }}
