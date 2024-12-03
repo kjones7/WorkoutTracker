@@ -31,13 +31,26 @@ export function ActiveWorkout() {
     })) ?? []
   );
 
-  const handleSetComplete = (exerciseIndex: number, setIndex: number, value: Partial<WorkoutSet>) => {
+  const handleSetDataUpdate = (exerciseIndex: number, setIndex: number, value: Partial<WorkoutSet>) => {
     setActiveExercises(prev => {
       const updated = [...prev];
       updated[exerciseIndex] = {
         ...updated[exerciseIndex],
         sets: updated[exerciseIndex].sets.map((set, idx) =>
-          idx === setIndex ? { ...set, ...value, completed: true } : set
+          idx === setIndex ? { ...set, ...value } : set
+        )
+      };
+      return updated;
+    });
+  };
+
+  const handleSetComplete = (exerciseIndex: number, setIndex: number, completed: boolean) => {
+    setActiveExercises(prev => {
+      const updated = [...prev];
+      updated[exerciseIndex] = {
+        ...updated[exerciseIndex],
+        sets: updated[exerciseIndex].sets.map((set, idx) =>
+          idx === setIndex ? { ...set, completed } : set
         )
       };
       return updated;
@@ -161,14 +174,14 @@ export function ActiveWorkout() {
                           className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
                           placeholder="lbs"
                           defaultValue={set.weight}
-                          onChange={(e) => handleSetComplete(exerciseIndex, setIndex, { weight: Number(e.target.value) })}
+                          onChange={(e) => handleSetDataUpdate(exerciseIndex, setIndex, { weight: Number(e.target.value) })}
                         />
                         <input
                           type="number"
                           className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
                           placeholder="reps"
                           defaultValue={set.reps}
-                          onChange={(e) => handleSetComplete(exerciseIndex, setIndex, { reps: Number(e.target.value) })}
+                          onChange={(e) => handleSetDataUpdate(exerciseIndex, setIndex, { reps: Number(e.target.value) })}
                         />
                       </>
                     ) : (
@@ -177,14 +190,14 @@ export function ActiveWorkout() {
                         className="w-full p-2 rounded bg-white border border-gray-200 text-sm col-span-2"
                         placeholder="0:00"
                         defaultValue={set.time}
-                        onChange={(e) => handleSetComplete(exerciseIndex, setIndex, { time: e.target.value })}
+                        onChange={(e) => handleSetDataUpdate(exerciseIndex, setIndex, { time: e.target.value })}
                       />
                     )}
                     <Button
                       variant={set.completed ? "default" : "ghost"}
                       size="sm"
                       className="w-8 h-8 p-0"
-                      onClick={() => handleSetComplete(exerciseIndex, setIndex, { completed: true })}
+                      onClick={() => handleSetComplete(exerciseIndex, setIndex, !set.completed)}
                     >
                       <Check className={`h-4 w-4 ${set.completed ? 'text-white' : 'text-gray-400'}`} />
                     </Button>
