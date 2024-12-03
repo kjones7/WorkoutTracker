@@ -25,10 +25,7 @@ export function HistoryPage() {
       const key = `workout:${workoutId}`;
       console.log("Attempting to delete workout with key:", key);
       
-      // First trigger the animation
-      setSelectedWorkout(workoutId);
-      
-      // Wait for animation to complete before deleting from database
+      // Start the animation
       setTimeout(async () => {
         try {
           await deleteWorkout(key);
@@ -51,14 +48,12 @@ export function HistoryPage() {
           });
         } finally {
           setSelectedWorkout(null);
-          setOpenDropdownId(null);
         }
       }, 300); // Match this with the CSS transition duration
       
     } catch (error) {
       console.error("Error in delete process:", error);
       setSelectedWorkout(null);
-      setOpenDropdownId(null);
     }
   };
 
@@ -183,6 +178,7 @@ export function HistoryPage() {
                           e.preventDefault();
                           e.stopPropagation();
                           setSelectedWorkout(workout.id);
+                          setOpenDropdownId(null);
                         }}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -289,9 +285,12 @@ export function HistoryPage() {
       <ConfirmDialog
         isOpen={!!selectedWorkout}
         onClose={() => setSelectedWorkout(null)}
-        onConfirm={() =>
-          selectedWorkout && handleDeleteWorkout(selectedWorkout)
-        }
+        onConfirm={() => {
+          if (selectedWorkout) {
+            // Trigger animation first by maintaining selectedWorkout state
+            handleDeleteWorkout(selectedWorkout);
+          }
+        }}
         title="Delete Workout"
         description="Are you sure you want to delete this workout? This action cannot be undone."
       />
