@@ -26,6 +26,10 @@ author = "agent"
 task = "workflow.run"
 args = "Dev Server"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "cleanup"
+
 [[workflows.workflow]]
 name = "Dev Server"
 author = "agent"
@@ -40,3 +44,21 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "npm run dev"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "cleanup"
+author = "agent"
+
+[workflows.workflow.metadata]
+agentRequireRestartOnSave = false
+
+[[workflows.workflow.tasks]]
+task = "packager.installForAll"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = """
+
+rm ./client/src/components/ui/calendar.tsx
+rm ./client/src/components/ui/input-otp.tsx
+"""

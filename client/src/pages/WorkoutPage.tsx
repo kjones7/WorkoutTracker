@@ -1,7 +1,7 @@
 import { CalendarClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { BottomNav } from "../components/BottomNav";
+import { BottomNav } from "../components/features/BottomNav";
 import { workoutTemplates } from "../data/templates";
 import { exercises } from "../data/exercises";
 import { useLocation } from "wouter";

@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Clock, Weight, Trophy, Trash2 } from "lucide-react";
-import { getWorkouts, deleteWorkout } from "../lib/database";
-import { exercises } from "../data/exercises";
-import type { WorkoutData } from "../lib/database";
-import { ConfirmDialog } from "../components/ConfirmDialog";
-import { useToast } from "../hooks/use-toast";
+import { getWorkouts, deleteWorkout } from "@/lib/database";
+import { exercises } from "@/data/exercises";
+import type { WorkoutData } from "@/lib/database";
+import { ConfirmDialog } from "@/components/features/workouts/ConfirmDialog";
+import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,

@@ -1,5 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Exercise } from "../lib/types";
+import { Exercise } from "../../../lib/types";
 
 interface ExerciseCardProps {
   exercise: Exercise;

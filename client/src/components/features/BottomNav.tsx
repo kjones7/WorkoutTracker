@@ -1,6 +1,6 @@
 import { User, History, Dumbbell, List } from "lucide-react";
 import { useLocation } from "wouter";
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/forms/button";
 
 export function BottomNav() {
   const [location, setLocation] = useLocation();

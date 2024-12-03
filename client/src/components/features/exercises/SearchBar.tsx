@@ -1,5 +1,6 @@
-import { Input } from "@/components/ui/input";
+import { Input } from "@/components/ui/forms/input";
 import { Search } from "lucide-react";
+import { ChangeEvent } from "react";
 
 interface SearchBarProps {
   value: string;
@@ -14,7 +15,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
         type="search"
         placeholder="Search"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
         className="pl-10 bg-gray-100 border-0"
       />
     </div>
