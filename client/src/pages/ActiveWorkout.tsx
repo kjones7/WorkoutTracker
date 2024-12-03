@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/forms/button";
 import { Check, MoreVertical, Timer, Trash2 } from "lucide-react";
 import { WorkoutTemplate } from "@/lib/types";
 import { exercises } from "@/data/exercises";
