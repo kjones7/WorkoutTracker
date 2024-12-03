@@ -25,6 +25,13 @@ export function HistoryPage() {
       const key = `workout:${workoutId}`;
       console.log("Attempting to delete workout with key:", key);
       
+      // Start the deletion animation
+      setWorkouts(prevWorkouts =>
+        prevWorkouts.map(workout =>
+          workout.id === workoutId ? { ...workout, isDeleting: true } : workout
+        )
+      );
+      
       // Wait for the animation duration before actually deleting
       setTimeout(async () => {
         try {
@@ -45,6 +52,12 @@ export function HistoryPage() {
             description: "Failed to delete workout. Please try again.",
             variant: "destructive",
           });
+          // Revert the deletion animation if there's an error
+          setWorkouts(prevWorkouts =>
+            prevWorkouts.map(workout =>
+              workout.id === workoutId ? { ...workout, isDeleting: false } : workout
+            )
+          );
         } finally {
           setSelectedWorkout(null);
         }
@@ -151,7 +164,7 @@ export function HistoryPage() {
               <Card 
                 key={workout.id} 
                 className={`p-4 transition-all duration-300 ease-in-out transform ${
-                  selectedWorkout === workout.id ? 'opacity-0 -translate-x-full' : 'opacity-100 translate-x-0'
+                  selectedWorkout === workout.id && workout.isDeleting ? 'opacity-0 -translate-x-full' : 'opacity-100 translate-x-0'
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">
@@ -176,7 +189,7 @@ export function HistoryPage() {
                           e.preventDefault();
                           e.stopPropagation();
                           setOpenDropdownId(null);
-                          setSelectedWorkout(workout.id);
+                          setSelectedWorkout(workout.id); // Show confirmation modal
                         }}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
