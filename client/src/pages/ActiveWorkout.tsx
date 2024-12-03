@@ -183,7 +183,7 @@ export function ActiveWorkout() {
                   <div></div>
                 </div>
                 {activeExercise.sets.map((set, setIndex) => (
-                  <div key={setIndex} 
+                  <div key={`${exerciseIndex}-${setIndex}`} 
                     className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200">
                     <div className="text-sm font-medium w-8">{setIndex + 1}</div>
                     {set.weight !== undefined ? (
@@ -228,16 +228,27 @@ export function ActiveWorkout() {
                       size="sm"
                       className="w-8 h-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
                       onClick={() => {
+                        console.log('Deleting set:', {
+                          exerciseIndex,
+                          setIndex,
+                          setData: activeExercise.sets[setIndex]
+                        });
+                        
                         setActiveExercises(prev => {
-                          // Create a deep copy of the previous state
-                          const updated = JSON.parse(JSON.stringify(prev));
+                          const updated = [...prev];
+                          const updatedSets = [...updated[exerciseIndex].sets];
+                          updatedSets.splice(setIndex, 1);
                           
-                          // Remove the specific set at setIndex
-                          updated[exerciseIndex].sets.splice(setIndex, 1);
+                          updated[exerciseIndex] = {
+                            ...updated[exerciseIndex],
+                            sets: updatedSets
+                          };
                           
-                          // Log for debugging
-                          console.log(`Deleted set ${setIndex + 1}`);
-                          console.log('Updated sets:', updated[exerciseIndex].sets);
+                          console.log('Updated exercise sets:', {
+                            exerciseId: updated[exerciseIndex].exerciseId,
+                            setsCount: updatedSets.length,
+                            sets: updatedSets
+                          });
                           
                           return updated;
                         });
