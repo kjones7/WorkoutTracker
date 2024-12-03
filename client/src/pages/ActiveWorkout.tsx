@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Check, MoreVertical, RotateCcw, Timer } from "lucide-react";
+import { Check, MoreVertical, RotateCcw, Timer, Trash2 } from "lucide-react";
 import { WorkoutTemplate } from "../lib/types";
 import { exercises } from "../data/exercises";
 import { useRestTimer } from "../hooks/useRestTimer";
@@ -169,7 +169,7 @@ export function ActiveWorkout() {
                 </button>
               </div>
               <div className="rounded-lg bg-gray-50 overflow-hidden">
-                <div className="grid grid-cols-[auto_1fr_1fr_auto] gap-2 px-4 py-2 bg-gray-100">
+                <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 bg-gray-100">
                   <div className="text-sm font-medium text-gray-500">Set</div>
                   {exercises.find(e => e.id === activeExercise.exerciseId)?.category === 'Duration' ? (
                     <div className="text-sm font-medium text-gray-500 col-span-2">Time</div>
@@ -180,10 +180,11 @@ export function ActiveWorkout() {
                     </>
                   )}
                   <div></div>
+                  <div></div>
                 </div>
                 {activeExercise.sets.map((set, setIndex) => (
                   <div key={setIndex} 
-                    className="grid grid-cols-[auto_1fr_1fr_auto] gap-2 px-4 py-2 items-center border-t border-gray-200">
+                    className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200">
                     <div className="text-sm font-medium w-8">{setIndex + 1}</div>
                     {set.weight !== undefined ? (
                       <>
@@ -221,6 +222,23 @@ export function ActiveWorkout() {
                       onClick={() => handleSetComplete(exerciseIndex, setIndex, !set.completed)}
                     >
                       <Check className={`h-4 w-4 ${set.completed ? 'text-white' : 'text-gray-400'}`} />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-8 h-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => {
+                        setActiveExercises(prev => {
+                          const updated = [...prev];
+                          updated[exerciseIndex] = {
+                            ...updated[exerciseIndex],
+                            sets: updated[exerciseIndex].sets.filter((_, idx) => idx !== setIndex)
+                          };
+                          return updated;
+                        });
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
                 ))}
