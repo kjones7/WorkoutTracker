@@ -172,6 +172,7 @@ export function ActiveWorkout() {
                         <input
                           type="number"
                           step="2.5"
+                          min="0"
                           className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
                           placeholder="lbs"
                           defaultValue={set.weight}
@@ -179,6 +180,7 @@ export function ActiveWorkout() {
                         />
                         <input
                           type="number"
+                          min="0"
                           className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
                           placeholder="reps"
                           defaultValue={set.reps}
