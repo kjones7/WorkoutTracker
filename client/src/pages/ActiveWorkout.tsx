@@ -140,10 +140,7 @@ export function ActiveWorkout() {
             </Button>
           </div>
         )}
-        <div className="flex justify-between items-center p-4">
-          <Button variant="ghost" size="icon" className="h-10 w-10">
-            <RotateCcw className="h-5 w-5 text-gray-500" />
-          </Button>
+        <div className="flex justify-end items-center p-4">
           <Button onClick={handleFinish} variant="default" className="bg-green-500 hover:bg-green-600">
             Finish
           </Button>
