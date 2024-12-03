@@ -1,21 +1,93 @@
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/forms/button";
 import { Check, MoreVertical, Timer, Trash2 } from "lucide-react";
-import { WorkoutTemplate } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 import { exercises } from "@/data/exercises";
-import { useRestTimer } from "@/hooks/useRestTimer";
+import type { WorkoutTemplate } from "@/lib/types";
+import type { ActiveExercise, WorkoutSet } from "@/lib/types";
+import { useRestTimer } from "@/hooks/use-rest-timer";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/layout/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-interface WorkoutSet {
-  weight?: number;
-  reps?: number;
-  time?: string;
-  completed: boolean;
+interface PlateCalculatorProps {
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-interface ActiveExercise {
-  exerciseId: string;
-  sets: WorkoutSet[];
+const PlateCalculator: React.FC<PlateCalculatorProps> = ({ isOpen, onClose }) => {
+  const [weight, setWeight] = React.useState<number>(45);
+  // Standard plate weights in pounds
+  const plateWeights = [45, 35, 25, 10, 5, 2.5];
+  const barWeight = 45; // Standard Olympic barbell weight
+
+  const calculatePlates = (targetWeight: number): number[] => {
+    const plates: number[] = [];
+    let remainingWeight = Math.max(0, targetWeight - barWeight) / 2; // Divide by 2 because plates go on both sides
+
+    plateWeights.forEach(plate => {
+      while (remainingWeight >= plate) {
+        plates.push(plate);
+        remainingWeight -= plate;
+      }
+    });
+
+    return plates;
+  };
+
+  const plates = calculatePlates(weight);
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Plate Calculator</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label htmlFor="weight" className="text-sm font-medium">
+              Total Weight (including bar)
+            </label>
+            <input
+              id="weight"
+              type="number"
+              step="2.5"
+              min={45}
+              value={weight}
+              onChange={(e) => setWeight(Number(e.target.value))}
+              className="w-full p-2 rounded border border-gray-200"
+            />
+          </div>
+          <div className="p-4 bg-gray-50 rounded-md space-y-2">
+            <div className="text-sm">
+              <span className="font-medium">Bar weight:</span> {barWeight}lb
+            </div>
+            <div className="text-sm">
+              <span className="font-medium">Plates per side:</span>{" "}
+              {plates.length > 0 ? plates.map(p => `${p}lb`).join(', ') : 'No plates needed'}
+            </div>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+interface WorkoutHeaderProps {
+  workoutName: string;
+  onFinish: () => void;
+  timeLeft: number | null;
+  isTimerActive: boolean;
+  onSkipTimer: () => void;
 }
 
 interface SetRowProps {
@@ -31,14 +103,6 @@ interface ExerciseCardProps {
   exercise: ActiveExercise;
   exerciseIndex: number;
   onExerciseUpdate: (value: ActiveExercise) => void;
-}
-
-interface WorkoutHeaderProps {
-  workoutName: string;
-  onFinish: () => void;
-  timeLeft: number | null;
-  isTimerActive: boolean;
-  onSkipTimer: () => void;
 }
 
 const SetRow: React.FC<SetRowProps> = ({
@@ -120,7 +184,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   const exerciseDetails = exercises.find((e) => e.id === exercise.exerciseId);
 
   const handleSetDataUpdate = (setIndex: number, value: Partial<WorkoutSet>) => {
-    const updatedSets = exercise.sets.map((set, idx) =>
+    const updatedSets = exercise.sets.map((set: WorkoutSet, idx: number) =>
       idx === setIndex ? { ...set, ...value } : set
     );
     onExerciseUpdate({ ...exercise, sets: updatedSets });
@@ -133,7 +197,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
       setData: exercise.sets[setIndex],
     });
     
-    const updatedSets = exercise.sets.filter((_, idx) => idx !== setIndex);
+    const updatedSets = exercise.sets.filter((_: WorkoutSet, idx: number) => idx !== setIndex);
     onExerciseUpdate({ ...exercise, sets: updatedSets });
     
     console.log("After deletion:", {
@@ -183,7 +247,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
           <div></div>
           <div></div>
         </div>
-        {exercise.sets.map((set, setIndex) => (
+        {exercise.sets.map((set: WorkoutSet, setIndex: number) => (
           <SetRow
             key={`${exercise.exerciseId}-${setIndex}`}
             set={set}
@@ -208,49 +272,69 @@ const WorkoutHeader: React.FC<WorkoutHeaderProps> = ({
   timeLeft,
   isTimerActive,
   onSkipTimer,
-}) => (
-  <div className="bg-white">
-    {isTimerActive && timeLeft !== null && (
-      <div className="fixed inset-x-0 top-0 bg-blue-500 text-white py-2 px-4 flex items-center justify-center gap-2">
-        <Timer className="h-4 w-4" />
-        <span>
-          Rest Timer: {Math.floor(timeLeft / 60)}:
-          {(timeLeft % 60).toString().padStart(2, "0")}
-        </span>
+}) => {
+  const [isPlateCalcOpen, setIsPlateCalcOpen] = React.useState(false);
+
+  return (
+    <div className="bg-white">
+      {isTimerActive && timeLeft !== null && (
+        <div className="fixed inset-x-0 top-0 bg-blue-500 text-white py-2 px-4 flex items-center justify-center gap-2">
+          <Timer className="h-4 w-4" />
+          <span>
+            Rest Timer: {Math.floor(timeLeft / 60)}:
+            {(timeLeft % 60).toString().padStart(2, "0")}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-white hover:text-blue-100"
+            onClick={onSkipTimer}
+          >
+            Skip
+          </Button>
+        </div>
+      )}
+      <div className="flex justify-between items-center p-4">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => setIsPlateCalcOpen(true)}>
+              Plate Calculator
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
-          variant="ghost"
-          size="sm"
-          className="text-white hover:text-blue-100"
-          onClick={onSkipTimer}
+          onClick={onFinish}
+          variant="default"
+          className="bg-green-500 hover:bg-green-600"
         >
-          Skip
+          Finish
         </Button>
       </div>
-    )}
-    <div className="flex justify-end items-center p-4">
-      <Button
-        onClick={onFinish}
-        variant="default"
-        className="bg-green-500 hover:bg-green-600"
-      >
-        Finish
-      </Button>
-    </div>
-    <div className="px-4 pb-4">
-      <h1 className="text-xl font-bold">{workoutName}</h1>
-      <div className="flex items-center mt-1">
-        <p className="text-base text-gray-900">
-          {new Date().toLocaleTimeString([], {
-            hour: "numeric",
-            minute: "2-digit",
-          })}
-        </p>
-        <div className="h-1 w-1 bg-gray-300 rounded-full mx-2" />
-        <button className="text-base text-gray-500">Notes</button>
+      <div className="px-4 pb-4">
+        <h1 className="text-xl font-bold">{workoutName}</h1>
+        <div className="flex items-center mt-1">
+          <p className="text-base text-gray-900">
+            {new Date().toLocaleTimeString([], {
+              hour: "numeric",
+              minute: "2-digit",
+            })}
+          </p>
+          <div className="h-1 w-1 bg-gray-300 rounded-full mx-2" />
+          <button className="text-base text-gray-500">Notes</button>
+        </div>
       </div>
+      <PlateCalculator 
+        isOpen={isPlateCalcOpen}
+        onClose={() => setIsPlateCalcOpen(false)}
+      />
     </div>
-  </div>
-);
+  );
+};
 
 export function ActiveWorkout() {
   const [, setLocation] = useLocation();
@@ -261,7 +345,7 @@ export function ActiveWorkout() {
 
   const [activeExercises, setActiveExercises] = useState<ActiveExercise[]>(
     () =>
-      workout?.exercises.map((e) => ({
+      workout?.exercises.map((e: { exerciseId: string }) => ({
         exerciseId: e.exerciseId,
         sets: [],
       })) ?? []
@@ -289,7 +373,7 @@ export function ActiveWorkout() {
           exercise.exerciseId &&
           Array.isArray(exercise.sets) &&
           exercise.sets.every(
-            (set) =>
+            (set: WorkoutSet) =>
               typeof set.completed === "boolean" &&
               (set.weight === undefined || typeof set.weight === "number") &&
               (set.reps === undefined || typeof set.reps === "number") &&
