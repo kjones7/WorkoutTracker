@@ -103,6 +103,7 @@ interface ExerciseCardProps {
   exercise: ActiveExercise;
   exerciseIndex: number;
   onExerciseUpdate: (value: ActiveExercise) => void;
+  startTimer: () => void;
 }
 
 const SetRow: React.FC<SetRowProps> = ({
@@ -180,6 +181,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exercise,
   exerciseIndex,
   onExerciseUpdate,
+  startTimer
 }) => {
   const exerciseDetails = exercises.find((e) => e.id === exercise.exerciseId);
 
@@ -256,10 +258,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             onDelete={() => handleSetDelete(setIndex)}
             onChange={(value) => handleSetDataUpdate(setIndex, value)}
             onComplete={(completed) => {
-    handleSetDataUpdate(setIndex, { completed });
-    if (completed) {
-      startTimer();
-    }
+              handleSetDataUpdate(setIndex, { completed });
+              if (completed) {
+                startTimer();
+              }
   }}
           />
         ))}
@@ -442,6 +444,7 @@ export function ActiveWorkout() {
             onExerciseUpdate={(updatedExercise) =>
               handleExerciseUpdate(exerciseIndex, updatedExercise)
             }
+            startTimer={startTimer}
           />
         ))}
       </div>
