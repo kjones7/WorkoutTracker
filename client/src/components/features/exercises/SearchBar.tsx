@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/forms/input";
+import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ChangeEvent } from "react";
 
@@ -7,6 +7,9 @@ interface SearchBarProps {
   onChange: (value: string) => void;
 }
 
+/**
+ * SearchBar is a component that renders an input field with a search icon that allows the user to search for exercises by name.
+ */
 export function SearchBar({ value, onChange }: SearchBarProps) {
   return (
     <div className="relative">

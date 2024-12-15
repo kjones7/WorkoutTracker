@@ -1,86 +1,18 @@
+
 import React, { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { Check, MoreVertical, Timer, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { exercises } from "@/data/exercises";
-import type { WorkoutTemplate } from "@/lib/types";
-import type { ActiveExercise, WorkoutSet } from "@/lib/types";
+import type { WorkoutTemplate, ActiveExercise, WorkoutSet } from "@/lib/types";
 import { useRestTimer } from "@/hooks/use-rest-timer";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/layout/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface PlateCalculatorProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const PlateCalculator: React.FC<PlateCalculatorProps> = ({ isOpen, onClose }) => {
-  const [weight, setWeight] = React.useState<number>(45);
-  // Standard plate weights in pounds
-  const plateWeights = [45, 35, 25, 10, 5, 2.5];
-  const barWeight = 45; // Standard Olympic barbell weight
-
-  const calculatePlates = (targetWeight: number): number[] => {
-    const plates: number[] = [];
-    let remainingWeight = Math.max(0, targetWeight - barWeight) / 2; // Divide by 2 because plates go on both sides
-
-    plateWeights.forEach(plate => {
-      while (remainingWeight >= plate) {
-        plates.push(plate);
-        remainingWeight -= plate;
-      }
-    });
-
-    return plates;
-  };
-
-  const plates = calculatePlates(weight);
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Plate Calculator</DialogTitle>
-        </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <label htmlFor="weight" className="text-sm font-medium">
-              Total Weight (including bar)
-            </label>
-            <input
-              id="weight"
-              type="number"
-              step="2.5"
-              min={45}
-              value={weight}
-              onChange={(e) => setWeight(Number(e.target.value))}
-              className="w-full p-2 rounded border border-gray-200"
-            />
-          </div>
-          <div className="p-4 bg-gray-50 rounded-md space-y-2">
-            <div className="text-sm">
-              <span className="font-medium">Bar weight:</span> {barWeight}lb
-            </div>
-            <div className="text-sm">
-              <span className="font-medium">Plates per side:</span>{" "}
-              {plates.length > 0 ? plates.map(p => `${p}lb`).join(', ') : 'No plates needed'}
-            </div>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
+import { PlateCalculator } from "@/components/features/workouts/PlateCalculator";
 
 interface WorkoutHeaderProps {
   workoutName: string;
@@ -113,60 +45,68 @@ const SetRow: React.FC<SetRowProps> = ({
   onDelete,
   onChange,
   onComplete,
-}) => {
-  return (
-    <div className={`grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200 transition-all duration-300 ease-in-out ${set.completed ? 'bg-green-50' : ''}`}>
-      <div className="text-sm font-medium w-8">{setIndex + 1}</div>
-      {exerciseType === "Duration" ? (
+}) => (
+  <div
+    className={`grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200 transition-all duration-300 ease-in-out ${
+      set.completed ? "bg-green-50" : ""
+    }`}
+  >
+    <div className="text-sm font-medium w-8">{setIndex + 1}</div>
+    {exerciseType === "Duration" ? (
+      <input
+        type="text"
+        className="w-full p-2 rounded bg-white border border-gray-200 text-sm col-span-2"
+        placeholder="0:00"
+        value={set.time || ""}
+        onChange={(e) => onChange({ time: e.target.value })}
+      />
+    ) : (
+      <>
         <input
-          type="text"
-          className="w-full p-2 rounded bg-white border border-gray-200 text-sm col-span-2"
-          placeholder="0:00"
-          value={set.time || ""}
-          onChange={(e) => onChange({ time: e.target.value })}
+          type="number"
+          step="2.5"
+          min="0"
+          className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
+          placeholder="lbs"
+          value={set.weight || ""}
+          onChange={(e) => onChange({ weight: Number(e.target.value) })}
         />
-      ) : (
-        <>
-          <input
-            type="number"
-            step="2.5"
-            min="0"
-            className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
-            placeholder="lbs"
-            value={set.weight || ""}
-            onChange={(e) => onChange({ weight: Number(e.target.value) })}
-          />
-          <input
-            type="number"
-            min="0"
-            className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
-            placeholder="reps"
-            value={set.reps || ""}
-            onChange={(e) => onChange({ reps: Number(e.target.value) })}
-          />
-        </>
-      )}
-      <Button
-        variant={set.completed ? "default" : "ghost"}
-        size="sm"
-        className={`w-8 h-8 p-0 transition-all duration-300 ease-in-out transform ${set.completed ? 'bg-green-500 hover:bg-green-600 scale-110' : 'hover:bg-green-50 scale-100'}`}
-        onClick={() => onComplete(!set.completed)}
-      >
-        <Check
-          className={`h-4 w-4 transition-all duration-300 ease-in-out ${set.completed ? "text-white scale-100" : "text-gray-400 scale-90 opacity-70"}`}
+        <input
+          type="number"
+          min="0"
+          className="w-full p-2 rounded bg-white border border-gray-200 text-sm"
+          placeholder="reps"
+          value={set.reps || ""}
+          onChange={(e) => onChange({ reps: Number(e.target.value) })}
         />
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="w-8 h-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
-        onClick={onDelete}
-      >
-        <Trash2 className="h-4 w-4" />
-      </Button>
-    </div>
-  );
-};
+      </>
+    )}
+    <Button
+      variant={set.completed ? "default" : "ghost"}
+      size="sm"
+      className={`w-8 h-8 p-0 transition-all duration-300 ease-in-out transform ${
+        set.completed
+          ? "bg-green-500 hover:bg-green-600 scale-110"
+          : "hover:bg-green-50 scale-100"
+      }`}
+      onClick={() => onComplete(!set.completed)}
+    >
+      <Check
+        className={`h-4 w-4 transition-all duration-300 ease-in-out ${
+          set.completed ? "text-white scale-100" : "text-gray-400 scale-90 opacity-70"
+        }`}
+      />
+    </Button>
+    <Button
+      variant="ghost"
+      size="sm"
+      className="w-8 h-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-50"
+      onClick={onDelete}
+    >
+      <Trash2 className="h-4 w-4" />
+    </Button>
+  </div>
+);
 
 const AddSetButton: React.FC<{ onClick: () => void }> = ({ onClick }) => (
   <button
@@ -181,7 +121,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exercise,
   exerciseIndex,
   onExerciseUpdate,
-  startTimer
+  startTimer,
 }) => {
   const exerciseDetails = exercises.find((e) => e.id === exercise.exerciseId);
 
@@ -193,20 +133,10 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   };
 
   const handleSetDelete = (setIndex: number) => {
-    console.log("Deleting set:", {
-      exerciseIndex,
-      setIndex,
-      setData: exercise.sets[setIndex],
-    });
-    
-    const updatedSets = exercise.sets.filter((_: WorkoutSet, idx: number) => idx !== setIndex);
+    const updatedSets = exercise.sets.filter(
+      (_: WorkoutSet, idx: number) => idx !== setIndex
+    );
     onExerciseUpdate({ ...exercise, sets: updatedSets });
-    
-    console.log("After deletion:", {
-      exerciseIndex,
-      setsCount: updatedSets.length,
-      updatedSets,
-    });
   };
 
   const handleAddSet = () => {
@@ -223,11 +153,13 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
     });
   };
 
+  if (!exerciseDetails) return null;
+
   return (
-    <div className="space-y-3">
+    <section className="space-y-3">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-blue-600">
-          {exerciseDetails?.name}
+          {exerciseDetails.name}
         </h2>
         <button className="p-2">
           <MoreVertical className="h-5 w-5 text-gray-500" />
@@ -236,7 +168,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
       <div className="rounded-lg bg-gray-50 overflow-hidden">
         <div className="grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 bg-gray-100">
           <div className="text-sm font-medium text-gray-500">Set</div>
-          {exerciseDetails?.category === "Duration" ? (
+          {exerciseDetails.category === "Duration" ? (
             <div className="text-sm font-medium text-gray-500 col-span-2">
               Time
             </div>
@@ -254,7 +186,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             key={`${exercise.exerciseId}-${setIndex}`}
             set={set}
             setIndex={setIndex}
-            exerciseType={exerciseDetails?.category || ""}
+            exerciseType={exerciseDetails.category}
             onDelete={() => handleSetDelete(setIndex)}
             onChange={(value) => handleSetDataUpdate(setIndex, value)}
             onComplete={(completed) => {
@@ -262,12 +194,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               if (completed) {
                 startTimer();
               }
-  }}
+            }}
           />
         ))}
         <AddSetButton onClick={handleAddSet} />
       </div>
-    </div>
+    </section>
   );
 };
 
@@ -281,7 +213,7 @@ const WorkoutHeader: React.FC<WorkoutHeaderProps> = ({
   const [isPlateCalcOpen, setIsPlateCalcOpen] = React.useState(false);
 
   return (
-    <div className="bg-white">
+    <header className="bg-white">
       {isTimerActive && timeLeft !== null && (
         <div className="fixed inset-x-0 top-0 bg-blue-500 text-white py-2 px-4 flex items-center justify-center gap-2">
           <Timer className="h-4 w-4" />
@@ -323,21 +255,21 @@ const WorkoutHeader: React.FC<WorkoutHeaderProps> = ({
       <div className="px-4 pb-4">
         <h1 className="text-xl font-bold">{workoutName}</h1>
         <div className="flex items-center mt-1">
-          <p className="text-base text-gray-900">
+          <time className="text-base text-gray-900">
             {new Date().toLocaleTimeString([], {
               hour: "numeric",
               minute: "2-digit",
             })}
-          </p>
+          </time>
           <div className="h-1 w-1 bg-gray-300 rounded-full mx-2" />
           <button className="text-base text-gray-500">Notes</button>
         </div>
       </div>
-      <PlateCalculator 
+      <PlateCalculator
         isOpen={isPlateCalcOpen}
         onClose={() => setIsPlateCalcOpen(false)}
       />
-    </div>
+    </header>
   );
 };
 
@@ -373,23 +305,6 @@ export function ActiveWorkout() {
         completedAt: new Date().toISOString(),
       };
 
-      const isValid = activeExercises.every(
-        (exercise) =>
-          exercise.exerciseId &&
-          Array.isArray(exercise.sets) &&
-          exercise.sets.every(
-            (set: WorkoutSet) =>
-              typeof set.completed === "boolean" &&
-              (set.weight === undefined || typeof set.weight === "number") &&
-              (set.reps === undefined || typeof set.reps === "number") &&
-              (set.time === undefined || typeof set.time === "string")
-          )
-      );
-
-      if (!isValid) {
-        throw new Error("Invalid workout data structure");
-      }
-
       const { saveWorkout } = await import("../lib/database");
       const key = await saveWorkout(workoutData);
 
@@ -418,7 +333,10 @@ export function ActiveWorkout() {
     );
   }
 
-  const handleExerciseUpdate = (exerciseIndex: number, updatedExercise: ActiveExercise) => {
+  const handleExerciseUpdate = (
+    exerciseIndex: number,
+    updatedExercise: ActiveExercise
+  ) => {
     setActiveExercises((prev) => {
       const updated = [...prev];
       updated[exerciseIndex] = updatedExercise;
@@ -427,7 +345,7 @@ export function ActiveWorkout() {
   };
 
   return (
-    <div className="min-h-screen pb-16">
+    <main className="min-h-screen pb-16">
       <WorkoutHeader
         workoutName={workout.name}
         onFinish={handleFinish}
@@ -448,6 +366,6 @@ export function ActiveWorkout() {
           />
         ))}
       </div>
-    </div>
+    </main>
   );
 }

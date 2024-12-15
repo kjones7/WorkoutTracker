@@ -1,5 +1,8 @@
 import { Exercise } from '../lib/types';
 
+/**
+ * The exercises available in the app.
+ */
 export const exercises: Exercise[] = [
   {
     id: '1',

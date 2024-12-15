@@ -1,7 +1,10 @@
 import { User, History, Dumbbell, List } from "lucide-react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/forms/button";
+import { Button } from "@/components/ui/button";
 
+/**
+ * BottomNav is a component that renders a navigation bar at the bottom of the screen.
+ */
 export function BottomNav() {
   const [location, setLocation] = useLocation();
 

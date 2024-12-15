@@ -5,6 +5,9 @@ interface ExerciseCardProps {
   exercise: Exercise;
 }
 
+/**
+ * ExerciseCard is a component that renders an exercise card with the exercise's name, body part, and category.
+ */
 export function ExerciseCard({ exercise }: ExerciseCardProps) {
   return (
     <Card className="p-4 flex items-center space-x-4 hover:bg-gray-50 transition-colors">

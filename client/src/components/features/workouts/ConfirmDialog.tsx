@@ -1,4 +1,13 @@
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
@@ -8,6 +17,9 @@ interface ConfirmDialogProps {
   description: string;
 }
 
+/**
+ * ConfirmDialog is a component that renders an alert dialog with a confirmation message and buttons to confirm or cancel.
+ */
 export function ConfirmDialog({
   isOpen,
   onClose,
@@ -24,7 +36,12 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={onClose}>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={onConfirm} className="bg-red-500 hover:bg-red-600 focus:ring-red-600">Delete</AlertDialogAction>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="bg-red-500 hover:bg-red-600 focus:ring-red-600"
+          >
+            Delete
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
