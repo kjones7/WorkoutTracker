@@ -255,9 +255,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
             exerciseType={exerciseDetails?.category || ""}
             onDelete={() => handleSetDelete(setIndex)}
             onChange={(value) => handleSetDataUpdate(setIndex, value)}
-            onComplete={(completed) =>
-              handleSetDataUpdate(setIndex, { completed })
-            }
+            onComplete={(completed) => {
+    handleSetDataUpdate(setIndex, { completed });
+    if (completed) {
+      startTimer();
+    }
+  }}
           />
         ))}
         <AddSetButton onClick={handleAddSet} />
