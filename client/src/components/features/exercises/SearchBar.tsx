@@ -1,4 +1,4 @@
-import { Input } from "@/components/ui/forms/input";
+import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { ChangeEvent } from "react";
 
