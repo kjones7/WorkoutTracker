@@ -17,6 +17,9 @@ interface FilterButtonsProps {
 const bodyParts: (BodyPart | 'Any')[] = ['Any', 'Arms', 'Back', 'Core', 'Legs', 'Shoulders', 'Chest'];
 const categories: (Category | 'Any')[] = ['Any', 'Barbell', 'Dumbbell', 'Bodyweight', 'Machine', 'Cable'];
 
+/**
+ * FilterButtons is a component that renders a set of buttons that allow the user to filter exercises by body part and category
+ */
 export function FilterButtons({
   selectedBodyPart,
   selectedCategory,
