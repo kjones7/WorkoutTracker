@@ -11,7 +11,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/layout/dialog";
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +24,10 @@ interface PlateCalculatorProps {
   onClose: () => void;
 }
 
-const PlateCalculator: React.FC<PlateCalculatorProps> = ({ isOpen, onClose }) => {
+const PlateCalculator: React.FC<PlateCalculatorProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const [weight, setWeight] = React.useState<number>(45);
   // Standard plate weights in pounds
   const plateWeights = [45, 35, 25, 10, 5, 2.5];
@@ -34,7 +37,7 @@ const PlateCalculator: React.FC<PlateCalculatorProps> = ({ isOpen, onClose }) =>
     const plates: number[] = [];
     let remainingWeight = Math.max(0, targetWeight - barWeight) / 2; // Divide by 2 because plates go on both sides
 
-    plateWeights.forEach(plate => {
+    plateWeights.forEach((plate) => {
       while (remainingWeight >= plate) {
         plates.push(plate);
         remainingWeight -= plate;
@@ -73,7 +76,9 @@ const PlateCalculator: React.FC<PlateCalculatorProps> = ({ isOpen, onClose }) =>
             </div>
             <div className="text-sm">
               <span className="font-medium">Plates per side:</span>{" "}
-              {plates.length > 0 ? plates.map(p => `${p}lb`).join(', ') : 'No plates needed'}
+              {plates.length > 0
+                ? plates.map((p) => `${p}lb`).join(", ")
+                : "No plates needed"}
             </div>
           </div>
         </div>
@@ -115,7 +120,9 @@ const SetRow: React.FC<SetRowProps> = ({
   onComplete,
 }) => {
   return (
-    <div className={`grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200 transition-all duration-300 ease-in-out ${set.completed ? 'bg-green-50' : ''}`}>
+    <div
+      className={`grid grid-cols-[auto_1fr_1fr_auto_auto] gap-2 px-4 py-2 items-center border-t border-gray-200 transition-all duration-300 ease-in-out ${set.completed ? "bg-green-50" : ""}`}
+    >
       <div className="text-sm font-medium w-8">{setIndex + 1}</div>
       {exerciseType === "Duration" ? (
         <input
@@ -149,7 +156,7 @@ const SetRow: React.FC<SetRowProps> = ({
       <Button
         variant={set.completed ? "default" : "ghost"}
         size="sm"
-        className={`w-8 h-8 p-0 transition-all duration-300 ease-in-out transform ${set.completed ? 'bg-green-500 hover:bg-green-600 scale-110' : 'hover:bg-green-50 scale-100'}`}
+        className={`w-8 h-8 p-0 transition-all duration-300 ease-in-out transform ${set.completed ? "bg-green-500 hover:bg-green-600 scale-110" : "hover:bg-green-50 scale-100"}`}
         onClick={() => onComplete(!set.completed)}
       >
         <Check
@@ -181,13 +188,16 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
   exercise,
   exerciseIndex,
   onExerciseUpdate,
-  startTimer
+  startTimer,
 }) => {
   const exerciseDetails = exercises.find((e) => e.id === exercise.exerciseId);
 
-  const handleSetDataUpdate = (setIndex: number, value: Partial<WorkoutSet>) => {
+  const handleSetDataUpdate = (
+    setIndex: number,
+    value: Partial<WorkoutSet>,
+  ) => {
     const updatedSets = exercise.sets.map((set: WorkoutSet, idx: number) =>
-      idx === setIndex ? { ...set, ...value } : set
+      idx === setIndex ? { ...set, ...value } : set,
     );
     onExerciseUpdate({ ...exercise, sets: updatedSets });
   };
@@ -198,10 +208,12 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
       setIndex,
       setData: exercise.sets[setIndex],
     });
-    
-    const updatedSets = exercise.sets.filter((_: WorkoutSet, idx: number) => idx !== setIndex);
+
+    const updatedSets = exercise.sets.filter(
+      (_: WorkoutSet, idx: number) => idx !== setIndex,
+    );
     onExerciseUpdate({ ...exercise, sets: updatedSets });
-    
+
     console.log("After deletion:", {
       exerciseIndex,
       setsCount: updatedSets.length,
@@ -262,7 +274,7 @@ const ExerciseCard: React.FC<ExerciseCardProps> = ({
               if (completed) {
                 startTimer();
               }
-  }}
+            }}
           />
         ))}
         <AddSetButton onClick={handleAddSet} />
@@ -333,7 +345,7 @@ const WorkoutHeader: React.FC<WorkoutHeaderProps> = ({
           <button className="text-base text-gray-500">Notes</button>
         </div>
       </div>
-      <PlateCalculator 
+      <PlateCalculator
         isOpen={isPlateCalcOpen}
         onClose={() => setIsPlateCalcOpen(false)}
       />
@@ -353,7 +365,7 @@ export function ActiveWorkout() {
       workout?.exercises.map((e: { exerciseId: string }) => ({
         exerciseId: e.exerciseId,
         sets: [],
-      })) ?? []
+      })) ?? [],
   );
 
   const { timeLeft, isActive, startTimer, stopTimer } = useRestTimer();
@@ -382,8 +394,8 @@ export function ActiveWorkout() {
               typeof set.completed === "boolean" &&
               (set.weight === undefined || typeof set.weight === "number") &&
               (set.reps === undefined || typeof set.reps === "number") &&
-              (set.time === undefined || typeof set.time === "string")
-          )
+              (set.time === undefined || typeof set.time === "string"),
+          ),
       );
 
       if (!isValid) {
@@ -418,7 +430,10 @@ export function ActiveWorkout() {
     );
   }
 
-  const handleExerciseUpdate = (exerciseIndex: number, updatedExercise: ActiveExercise) => {
+  const handleExerciseUpdate = (
+    exerciseIndex: number,
+    updatedExercise: ActiveExercise,
+  ) => {
     setActiveExercises((prev) => {
       const updated = [...prev];
       updated[exerciseIndex] = updatedExercise;
