@@ -1,5 +1,5 @@
 import { CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/forms/button";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useLocation } from "wouter";
 import { exercises } from "../data/exercises";
