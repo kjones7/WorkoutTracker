@@ -3,6 +3,8 @@
 
 A React-based workout tracking application built with TypeScript, Express, and Tailwind CSS. Track your workouts, exercises, and progress all in one place.
 
+Built using Replit and Replit AI.
+
 ## Features
 
 - Track active workouts with sets, reps, and weights
