@@ -31,7 +31,7 @@ A React-based workout tracking application built with TypeScript, Express, and T
 ```
 client/
   ├── src/
-  │   ├── components/    # UI and feature components
+  │   ├── components/   # UI and feature components
   │   ├── data/         # Static data and templates
   │   ├── hooks/        # Custom React hooks
   │   ├── lib/          # Utilities and types
