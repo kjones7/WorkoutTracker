@@ -28,7 +28,7 @@ export const saveWorkout = async (workoutData: WorkoutData): Promise<string> => 
   }
 
   const result = await response.json();
-  return result.key;
+  return result.id;
 };
 
 export const getWorkouts = async (): Promise<WorkoutData[]> => {
