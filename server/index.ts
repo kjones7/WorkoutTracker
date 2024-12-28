@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic } from "./vite";
 import { createServer } from "http";
-import { initializeDatabase } from "@db/index";
+import { initializeDatabase, closeDatabase } from "@db/index";
 
 function log(message: string) {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -49,14 +49,16 @@ app.use((req, res, next) => {
   next();
 });
 
-(async () => {
+let server: ReturnType<typeof createServer>;
+
+async function startServer() {
   try {
     // Initialize database before registering routes
     await initializeDatabase();
     log("Database initialized successfully");
 
-    registerRoutes(app);
-    const server = createServer(app);
+    await registerRoutes(app);
+    server = createServer(app);
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
@@ -80,4 +82,21 @@ app.use((req, res, next) => {
     console.error("Failed to start server:", error);
     process.exit(1);
   }
-})();
+}
+
+// Handle graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received. Closing HTTP server...');
+  if (server) {
+    server.close(() => {
+      console.log('HTTP server closed');
+      closeDatabase();
+      process.exit(0);
+    });
+  } else {
+    closeDatabase();
+    process.exit(0);
+  }
+});
+
+startServer();

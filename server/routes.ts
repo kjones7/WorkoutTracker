@@ -1,7 +1,9 @@
 import type { Express } from "express";
 import { v4 as uuid } from "uuid";
-import { db, workouts, initializeDatabase } from "@db/index";
+import { workouts, getDb } from "@db/index";
 import { eq } from "drizzle-orm";
+import type { Workout } from "@db/schema";
+import { validateWorkout } from "./middleware/validate";
 
 interface WorkoutData {
   id: string;
@@ -19,12 +21,9 @@ interface WorkoutData {
 }
 
 export async function registerRoutes(app: Express) {
-  // Initialize database
-  await initializeDatabase();
-
-  app.post("/api/workouts", async (req, res) => {
+  app.post("/api/workouts", validateWorkout, async (req, res) => {
     try {
-      console.log("Received workout data:", req.body);
+      console.log("Received validated workout data:", req.body);
 
       const workoutId = uuid();
       const workoutData: WorkoutData = {
@@ -32,18 +31,11 @@ export async function registerRoutes(app: Express) {
         id: workoutId,
       };
 
-      // Validate required fields
-      if (!workoutData.name || !Array.isArray(workoutData.exercises)) {
-        console.error("Invalid workout data:", workoutData);
-        return res.status(400).json({ 
-          message: "Invalid workout data. Name and exercises are required." 
-        });
-      }
-
       // Ensure exercises is properly stringified
       const exercisesJson = JSON.stringify(workoutData.exercises);
       console.log("Stringified exercises:", exercisesJson);
 
+      const db = getDb();
       await db.insert(workouts).values({
         id: workoutId,
         name: workoutData.name,
@@ -68,10 +60,11 @@ export async function registerRoutes(app: Express) {
   app.get("/api/workouts", async (_req, res) => {
     try {
       console.log("Fetching all workouts");
+      const db = getDb();
       const dbWorkouts = await db.select().from(workouts);
       console.log("Raw workouts from database:", dbWorkouts);
 
-      const processedWorkouts = dbWorkouts.map(workout => {
+      const processedWorkouts = dbWorkouts.map((workout: Workout) => {
         try {
           return {
             ...workout,
@@ -81,7 +74,7 @@ export async function registerRoutes(app: Express) {
           console.error(`Error parsing exercises for workout ${workout.id}:`, error);
           return workout;
         }
-      }).sort((a, b) => 
+      }).sort((a: Workout, b: Workout) => 
         new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
       );
 
@@ -104,6 +97,7 @@ export async function registerRoutes(app: Express) {
       const { id } = req.params;
       console.log("Attempting to delete workout:", id);
 
+      const db = getDb();
       const result = await db.delete(workouts)
         .where(eq(workouts.id, id));
 
