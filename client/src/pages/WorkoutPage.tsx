@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { PlayCircle } from "lucide-react";
 
 export function WorkoutPage() {
+  // activeWorkout state can be any type, default is null
   const [activeWorkout, setActiveWorkout] = useState<any>(null);
 
   useEffect(() => {
@@ -52,7 +53,14 @@ export function WorkoutPage() {
     );
   };
 
+  /**
+   * Defining this component within WorkoutPage simplfies things because we don't need to pass the activeWorkout state in as a prop.
+   */
   const ActiveWorkoutCard = () => {
+    /**
+     * useLocation() is from wouter, which is a library for routing in React.
+     * It returns an array of the current path (which is ignored below) and a function to update the path.
+     */
     const [, setLocation] = useLocation();
 
     return (
