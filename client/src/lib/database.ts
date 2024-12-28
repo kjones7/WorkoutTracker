@@ -11,6 +11,7 @@ export interface WorkoutData {
     }>;
   }>;
   completedAt: string;
+  isDeleting?: boolean;
 }
 
 export const saveWorkout = async (workoutData: WorkoutData): Promise<string> => {
