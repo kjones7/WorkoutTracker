@@ -1,8 +1,9 @@
 import type { Express } from "express";
-import Database from "@replit/database";
 import { v4 as uuid } from "uuid";
-
-const db = new Database();
+import { workouts, getDb } from "@db/index";
+import { eq } from "drizzle-orm";
+import type { Workout } from "@db/schema";
+import { validateWorkout } from "./middleware/validate";
 
 interface WorkoutData {
   id: string;
@@ -19,103 +20,141 @@ interface WorkoutData {
   completedAt: string;
 }
 
-export function registerRoutes(app: Express) {
-  app.post("/api/workouts", async (req, res) => {
-    try {
-      const workoutId = uuid();
-      const workoutData: WorkoutData = {
-        ...req.body,
-        id: workoutId,
-      };
-      const key = `workout:${workoutId}`;
+type ProcessedWorkout = {
+  id: string;
+  name: string;
+  exercises: any;
+  completedAt: string;
+  _parseError?: boolean;
+}
 
-      await db.set(key, workoutData);
-      res.json({ message: "Workout saved successfully", key });
+export async function registerRoutes(app: Express) {
+  app.post("/api/workouts", validateWorkout, async (req, res) => {
+    const db = getDb();
+    try {
+      console.log("[Routes] Starting workout creation transaction");
+      const result = await db.transaction(async (tx) => {
+        console.log("[Routes] Received validated workout data:", req.body);
+
+        const workoutId = uuid();
+        const workoutData: WorkoutData = {
+          ...req.body,
+          id: workoutId,
+        };
+
+        // Ensure exercises is properly stringified
+        const exercisesJson = JSON.stringify(workoutData.exercises);
+        console.log("[Routes] Stringified exercises:", exercisesJson);
+
+        await tx.insert(workouts).values({
+          id: workoutId,
+          name: workoutData.name,
+          exercises: exercisesJson,
+          completedAt: workoutData.completedAt || new Date().toISOString(),
+        });
+
+        return workoutId;
+      });
+
+      console.log("[Routes] Successfully saved workout:", result);
+      res.json({ message: "Workout saved successfully", id: result });
     } catch (error) {
-      console.error("Error saving workout:", error);
-      res.status(500).json({ message: "Failed to save workout" });
+      console.error("[Routes] Error saving workout:", error);
+      if (error instanceof Error) {
+        console.error("[Routes] Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+      res.status(500).json({ 
+        message: "Failed to save workout",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
   app.get("/api/workouts", async (_req, res) => {
+    const db = getDb();
     try {
-      // Get all keys with prefix 'workout:'
-      const dbResponse = await db.list("workout:");
-      console.log("Raw database response:", dbResponse);
+      console.log("[Routes] Fetching all workouts");
+      const dbWorkouts = await db.select().from(workouts);
+      console.log("[Routes] Raw workouts from database:", dbWorkouts);
 
-      if (!dbResponse?.ok || !Array.isArray(dbResponse.value)) {
-        console.log("No valid database list found");
-        return res.json([]);
-      }
+      const processedWorkouts: ProcessedWorkout[] = dbWorkouts.map((workout) => {
+        try {
+          return {
+            ...workout,
+            exercises: JSON.parse(workout.exercises),
+          };
+        } catch (error) {
+          console.error(`[Routes] Error parsing exercises for workout ${workout.id}:`, error);
+          return {
+            ...workout,
+            exercises: [],
+            _parseError: true
+          };
+        }
+      });
 
-      const dbList = dbResponse.value;
-      console.log("Processing database keys:", dbList);
-
-      const workouts = await Promise.all(
-        dbList.map(async (key) => {
-          try {
-            const workout = await db.get(key);
-            console.log(`Fetched workout for key ${key}:`, workout);
-
-            // If we get a 404 or null, this workout was deleted
-            if (!workout || workout?.error?.statusCode === 404) {
-              return null;
-            }
-
-            // Keep the numeric timestamp format
-            const timestamp = key.replace("workout:", "");
-            return {
-              ...workout,
-              completedAt: timestamp,
-            };
-          } catch (err) {
-            console.warn(`Error processing workout ${key}:`, err);
-            return null;
-          }
-        }),
+      // Sort workouts by completedAt date
+      const sortedWorkouts = processedWorkouts.sort((a, b) => 
+        new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
       );
 
-      const validWorkouts = workouts
-        .filter((w): w is NonNullable<typeof w> => w !== null)
-        .map((w) => w.value) // Extract the workout data from the response
-        .sort(
-          (a, b) =>
-            new Date(b.completedAt).getTime() -
-            new Date(a.completedAt).getTime(),
-        );
-
-      console.log("Final processed workouts:", validWorkouts);
-      res.json(validWorkouts);
+      console.log("[Routes] Processed workouts:", sortedWorkouts);
+      res.json(sortedWorkouts);
     } catch (error) {
-      console.error("Error retrieving workouts:", error);
-      res.status(500).json({ message: "Failed to retrieve workouts" });
+      console.error("[Routes] Error retrieving workouts:", error);
+      if (error instanceof Error) {
+        console.error("[Routes] Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+      res.status(500).json({ 
+        message: "Failed to retrieve workouts",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
-  app.delete("/api/workouts/:key", async (req, res) => {
+
+  app.delete("/api/workouts/:id", async (req, res) => {
+    const db = getDb();
     try {
-      const keyParam = req.params.key;
-      console.log("Received delete request for key:", keyParam);
+      const { id } = req.params;
+      console.log("[Routes] Starting workout deletion transaction for:", id);
 
-      // Ensure consistent key format
-      const key = keyParam.startsWith("workout:")
-        ? keyParam
-        : `workout:${keyParam}`;
-      console.log("Attempting deletion for key:", key);
+      await db.transaction(async (tx) => {
+        const result = await tx.delete(workouts)
+          .where(eq(workouts.id, id));
 
-      // Get current workout data to verify it exists
-      const workoutData = await db.get(key);
-      if (!workoutData || workoutData?.error?.statusCode === 404) {
-        console.log("Workout not found:", key);
+        if (!result) {
+          throw new Error(`No workout found with id: ${id}`);
+        }
+      });
+
+      console.log("[Routes] Successfully deleted workout:", id);
+      res.json({ message: "Workout deleted successfully" });
+    } catch (error) {
+      console.error("[Routes] Error deleting workout:", error);
+      if (error instanceof Error) {
+        console.error("[Routes] Error details:", {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+      }
+
+      if (error instanceof Error && error.message.includes("No workout found")) {
         return res.status(404).json({ message: "Workout not found" });
       }
 
-      // Perform deletion
-      await db.delete(key);
-      console.log("Successfully deleted workout:", key);
-      res.json({ message: "Workout deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting workout:", error);
-      res.status(500).json({ message: "Failed to delete workout" });
+      res.status(500).json({ 
+        message: "Failed to delete workout",
+        error: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 }

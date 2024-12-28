@@ -22,7 +22,7 @@ export function HistoryPage() {
 
   const handleDeleteWorkout = async (workoutId: string) => {
     try {
-      const key = `workout:${workoutId}`;
+      const key = workoutId;
       
       // First, set the isDeleting flag to trigger the animation
       setWorkouts(prevWorkouts =>
