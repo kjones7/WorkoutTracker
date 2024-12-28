@@ -18,9 +18,10 @@ Built using Replit and Replit AI.
 
 - Frontend: React, TypeScript, Tailwind CSS
 - Backend: Express.js
-- Database: Replit Database
+- Database: SQLite with Drizzle ORM
 - UI Components: Radix UI, Lucide Icons
 - State Management: React Query
+- Routing: Wouter
 
 ## Development
 
@@ -41,7 +42,17 @@ client/
 server/
   ├── index.ts          # Express server setup
   └── routes.ts         # API routes
+db/
+  ├── index.ts          # Database initialization
+  └── schema.ts         # Database schema
 ```
+
+## Data Persistence
+
+The application uses SQLite for data storage, with the following features:
+- WAL (Write-Ahead Logging) mode for better concurrent access
+- Drizzle ORM for type-safe database operations
+- Automatic schema creation and migration
 
 ## Running the Project
 
