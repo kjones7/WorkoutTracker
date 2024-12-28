@@ -10,16 +10,19 @@ let sqlite: Database.Database;
 export async function initializeDatabase() {
   try {
     if (db) {
-      console.log("Database already initialized, reusing existing connection");
+      console.log("[Database] Already initialized, reusing existing connection");
       return db;
     }
 
-    console.log("Initializing SQLite database...");
+    console.log("[Database] Initializing SQLite database...");
 
-    // Initialize SQLite connection
+    // Initialize SQLite connection with detailed logging
     sqlite = new Database.default("sqlite.db", {
-      verbose: console.log
+      verbose: (message) => console.log(`[SQLite Debug] ${message}`),
     });
+
+    // Enable WAL mode for better concurrent access
+    sqlite.pragma('journal_mode = WAL');
 
     // Create tables if they don't exist
     const createTableQuery = `
@@ -31,43 +34,70 @@ export async function initializeDatabase() {
       );
     `;
 
-    console.log("Creating tables with query:", createTableQuery);
-    sqlite.exec(createTableQuery);
-    console.log("Database schema created successfully");
+    console.log("[Database] Creating tables with query:", createTableQuery);
+
+    // Use transaction for table creation
+    sqlite.transaction(() => {
+      sqlite.exec(createTableQuery);
+    })();
+
+    console.log("[Database] Schema created successfully");
 
     // Test database connection with proper type assertion
     const testQuery = sqlite.prepare("SELECT 1 as test").get() as { test: number } | undefined;
     if (testQuery?.test === 1) {
-      console.log("Database connection test successful");
+      console.log("[Database] Connection test successful");
     } else {
       throw new Error("Database connection test failed");
     }
 
-    // Initialize Drizzle
-    db = drizzle(sqlite);
+    // Initialize Drizzle with prepared statements cache
+    db = drizzle(sqlite, {
+      logger: true
+    });
+
     return db;
   } catch (error) {
-    console.error("Error initializing database:", error);
+    console.error("[Database] Error during initialization:", error);
     if (error instanceof Error) {
-      console.error("Error details:", error.message, error.stack);
+      console.error("[Database] Error details:", error.message);
+      console.error("[Database] Stack trace:", error.stack);
     }
     throw error;
   }
 }
 
-// Getter for database instance
+// Getter for database instance with connection check
 export function getDb() {
   if (!db) {
-    throw new Error("Database not initialized. Call initializeDatabase first.");
+    throw new Error("[Database] Not initialized. Call initializeDatabase first.");
   }
-  return db;
+
+  try {
+    // Quick connection test
+    const test = sqlite.prepare("SELECT 1").get();
+    if (!test) {
+      throw new Error("[Database] Connection lost");
+    }
+    return db;
+  } catch (error) {
+    console.error("[Database] Error accessing database:", error);
+    throw new Error("[Database] Connection error, try reinitializing");
+  }
 }
 
 // Cleanup function for graceful shutdown
 export function closeDatabase() {
   if (sqlite) {
-    console.log("Closing database connection...");
-    sqlite.close();
+    console.log("[Database] Closing connection...");
+    try {
+      sqlite.pragma('wal_checkpoint(TRUNCATE)');
+      sqlite.close();
+      console.log("[Database] Connection closed successfully");
+    } catch (error) {
+      console.error("[Database] Error during closure:", error);
+      throw error;
+    }
   }
 }
 
