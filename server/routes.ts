@@ -20,6 +20,14 @@ interface WorkoutData {
   completedAt: string;
 }
 
+type ProcessedWorkout = {
+  id: string;
+  name: string;
+  exercises: any;
+  completedAt: string;
+  _parseError?: boolean;
+}
+
 export async function registerRoutes(app: Express) {
   app.post("/api/workouts", validateWorkout, async (req, res) => {
     const db = getDb();
@@ -73,7 +81,7 @@ export async function registerRoutes(app: Express) {
       const dbWorkouts = await db.select().from(workouts);
       console.log("[Routes] Raw workouts from database:", dbWorkouts);
 
-      const processedWorkouts = dbWorkouts.map((workout: Workout) => {
+      const processedWorkouts: ProcessedWorkout[] = dbWorkouts.map((workout) => {
         try {
           return {
             ...workout,
@@ -87,12 +95,15 @@ export async function registerRoutes(app: Express) {
             _parseError: true
           };
         }
-      }).sort((a: Workout, b: Workout) => 
+      });
+
+      // Sort workouts by completedAt date
+      const sortedWorkouts = processedWorkouts.sort((a, b) => 
         new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()
       );
 
-      console.log("[Routes] Processed workouts:", processedWorkouts);
-      res.json(processedWorkouts);
+      console.log("[Routes] Processed workouts:", sortedWorkouts);
+      res.json(sortedWorkouts);
     } catch (error) {
       console.error("[Routes] Error retrieving workouts:", error);
       if (error instanceof Error) {
